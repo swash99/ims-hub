@@ -1,0 +1,24 @@
+@charset "UTF-8";
+@font-face {
+  font-family: 'entypo';
+  src: url('../fonts/entypo.woff') format('woff');
+}
+.entypo-home:before{ content: '\E822'; }
+.entypo-tools:before{ content: '\E857'; }
+.entypo-mail:before{ content: '\E806'; }
+.entypo-user:before { content: '\E80b';}
+.entypo-users:before { content: '\E80c'; }
+.entypo-archive:before { content: '\E852'; }
+.entypo-basket:before { content: '\E85a'; }
+.entypo-book-open:before { content: '\E84f'; }
+.entypo-plus:before { content: '\E817'; }
+.entypo-left-open-big:before { content: '\E87D'; }
+.entypo-right-open-big:before { content: '\E87E'; }
+.entypo-trash:before { content: '\e848'; }
+.entypo-attention:before{ content: '\E83F'; }
+.entypo-settings:before{ content: '\E856'; }
+.entypo-bell:before{ content: '\e83e'; }
+.entypo-card:before{ content: '\e841'; }
+.entypo-info:before{ content: '\e820'; }
+.entypo-paper:before{ content: '\e84e'; }
+.entypo-pencil:before{ content: '\e837'; }

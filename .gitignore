@@ -1,0 +1,5 @@
+/ims-hub.sublime-project
+/ims-hub.sublime-workspace
+phpdoc/*
+mpdf/*
+phpmailer/*
