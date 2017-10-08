@@ -178,7 +178,7 @@ $readonly = $_SESSION["date"] <= date('Y-m-d', strtotime("-".$_SESSION["history_
                     if ($("#name").html() != "search result") {
                         if ($(".switch-input").prop("checked")) { checkEmpty(); }
                     }
-                    updateCount(row.children[6].value);
+                    updateCount(row.children[5].value);
                 }
             })
             .fail(function() {
@@ -269,7 +269,7 @@ $readonly = $_SESSION["date"] <= date('Y-m-d', strtotime("-".$_SESSION["history_
         }
     }
 
-    function createInfogram(yesterday, dayBefore) {
+    function createInfogram(last, lastDate, secLast, secLastDate) {
         var divMain = document.createElement("div");
         var divCon = document.createElement("div");
         var divLeft = document.createElement("div");
@@ -287,19 +287,27 @@ $readonly = $_SESSION["date"] <= date('Y-m-d', strtotime("-".$_SESSION["history_
         divTopRight.setAttribute("class", "info_div_top");
         divBottomRight.setAttribute("class", "info_div_bottom");
 
-        divTopLeft.innerHTML = "yesterday";
-        divTopRight.innerHTML = "day before";
-        divBottomLeft.innerHTML = yesterday;
-        divBottomRight.innerHTML = dayBefore;
+        if (lastDate == "") {
+            divTopLeft.innerHTML = "no previous entries";
+            divLeft.appendChild(divTopLeft);
+            divCon.appendChild(divLeft);
+            divMain.appendChild(divCon);
 
-        divLeft.appendChild(divTopLeft);
-        divLeft.appendChild(divBottomLeft);
-        divRight.appendChild(divTopRight);
-        divRight.appendChild(divBottomRight);
+        } else {
+            divTopLeft.innerHTML = lastDate;
+            divTopRight.innerHTML = secLastDate;
+            divBottomLeft.innerHTML = last;
+            divBottomRight.innerHTML = secLast;
 
-        divCon.appendChild(divLeft);
-        divCon.appendChild(divRight);
-        divMain.appendChild(divCon);
+            divLeft.appendChild(divTopLeft);
+            divLeft.appendChild(divBottomLeft);
+            divRight.appendChild(divTopRight);
+            divRight.appendChild(divBottomRight);
+
+            divCon.appendChild(divLeft);
+            divCon.appendChild(divRight);
+            divMain.appendChild(divCon);
+        }
         return divMain;
     }
 
@@ -347,9 +355,11 @@ $readonly = $_SESSION["date"] <= date('Y-m-d', strtotime("-".$_SESSION["history_
         });
 
         $(document).on("focus", ".quantity_input", function() {
-            var yesterday = $(this).parents("tr").find("#quantity_yesterday").val();
-            var dayBefore = $(this).parents("tr").find("#quantity_day_before").val();
-            $(this).parent().append(createInfogram(yesterday, dayBefore));
+            var last = $(this).parents("tr").find("#quantity_yesterday").val();
+            var lastDate = $(this).parents("tr").find("#last_date").val();
+            var secLast = $(this).parents("tr").find("#quantity_day_before").val();
+            var secLastDate = $(this).parents("tr").find("#seclast_date").val();
+            $(this).parent().append(createInfogram(last, lastDate, secLast, secLastDate));
             $(this).parent().find(".info_div_main").css("opacity");
             $(this).parent().find(".info_div_main").addClass("visible");
         });

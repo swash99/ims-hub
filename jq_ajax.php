@@ -178,8 +178,8 @@ if (isset($_POST["getPrintPreview"])) {
 if (isset($_POST["getInventory"])) {
     $result = InventoryTable::get_inventory($_POST["categoryId"], $_POST["date"]);
     while ($row = $result -> fetch_assoc()) {
-        $quantity_yesterday = InventoryTable::get_quantity_by_date(date_format((date_add(date_create($_POST["date"]), date_interval_create_from_date_string("-1 day"))), 'Y-m-d'), $row["id"]);
-        $quantity_day_before = InventoryTable::get_quantity_by_date(date_format((date_add(date_create($_POST["date"]), date_interval_create_from_date_string("-2 day"))), 'Y-m-d'), $row["id"]);
+        $entry_last = InventoryTable::get_last_entry($row["id"], $_POST["date"])->fetch_assoc();
+        $entry_second_last = InventoryTable::get_second_last_entry($row["id"], $_POST["date"])->fetch_assoc();
         echo '<tr>
                 <td class="item_name">'.$row["name"].'</td>
                 <td>'.$row["unit"].'</td>
@@ -188,8 +188,10 @@ if (isset($_POST["getInventory"])) {
                 <td><input type="text" value="'.$row["notes"].'" onchange=updateInventory(this) '.$readonly.' ></td>
                 <input type="hidden" value='.$row["id"].'>
                 <input type="hidden" id="cat_id" value='.$row["cat_id"].'>
-                <input type="hidden" id="quantity_yesterday" value='.($quantity_yesterday == "" ? "-" : $quantity_yesterday).'>
-                <input type="hidden" id="quantity_day_before" value='.($quantity_day_before == "" ? "-" : $quantity_day_before).'>
+                <input type="hidden" id="quantity_yesterday" value='.($entry_last["quantity"] == "" ? "-" : $entry_last["quantity"]).'>
+                <input type="hidden" id="last_date" value="'.($entry_last["date"] == "" ? "" : date("jS M Y", strtotime($entry_last["date"]))).'">
+                <input type="hidden" id="quantity_day_before" value='.($entry_second_last["quantity"] == "" ? "-" : $entry_second_last["quantity"]).'>
+                <input type="hidden" id="seclast_date" value="'.($entry_second_last["date"] == "" ? "" :date("jS M Y", strtotime($entry_second_last["date"]))).'">
             </tr>';
     }
 }

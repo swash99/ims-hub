@@ -63,5 +63,25 @@ class InventoryTable extends DatabaseTable {
         return parent::query($sql)->fetch_assoc()["quantity"];
     }
 
+    public static function get_last_entry($item_id, $date) {
+        $sql = "SELECT * FROM Inventory
+                WHERE item_id  = $item_id
+                AND `date` < '$date'
+                AND quantity IS NOT NULL
+                ORDER BY id DESC LIMIT 1";
+
+        return parent::query($sql);
+    }
+
+    public static function get_second_last_entry($item_id, $date) {
+        $sql = "SELECT * FROM Inventory
+                WHERE item_id  = $item_id
+                AND `date` < '$date'
+                AND quantity IS NOT NULL
+                ORDER BY id DESC LIMIT 1,1";
+
+        return parent::query($sql);
+    }
+
 }
 ?>

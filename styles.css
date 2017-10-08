@@ -1431,11 +1431,13 @@ td.table_heading{
 .info_div_top{
     text-transform: uppercase;
     font-size: 11px;
+    padding: 4px;
 }
 .info_div_bottom{
     display: flex;
     flex: 1;
-    padding: 4px;
+    padding: 2px 4px;
+    text-transform: uppercase;
     font-weight: bold;
     justify-content: center;
     align-items: center;
