@@ -224,8 +224,7 @@ if (isset($_POST["printAll"])) {
             echo '<table class="table_view"><tr class="row"><th colspan="4" class="table_title">'.$row["name"].'</th></tr><tbody class="print_tbody" id="print_tbody">
                     <tr id="print_date" class="row">
                         <th colspan="4">
-                            <span id="table_date_span">'.date_format((date_add(date_create($_POST["date"]), date_interval_create_from_date_string("1 day"))), 'D, jS M Y').'</span>
-                            <div class="print_table_date">'."created on ".date('jS M Y', strtotime($_POST["date"])).'</div>
+                            <span class="table_date_span">'.date('D, jS M Y', strtotime($_POST["date"])).'</span>
                         </th>
                     </tr>
                     <tr id="category_columns" class="heading">

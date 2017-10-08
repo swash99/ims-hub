@@ -72,8 +72,7 @@ $_SESSION["last_activity"] = time();
             <div id="div_print_table">
                 <table class="table_view" id="print">
                     <tr id="print_date" class="row">
-                        <th colspan="7">
-                            <div id="table_date_heading"></div>
+                        <th colspan="4">
                             <span id="table_date_span"><?php echo date_format((date_add(date_create($_SESSION["date"]), date_interval_create_from_date_string("1 day"))), 'D, jS M Y'); ?></span>
                             <div class="print_table_date"><?php echo "created on ".date('jS M Y', strtotime($_SESSION["date"])); ?></div>
                         </th>
@@ -100,7 +99,7 @@ $_SESSION["last_activity"] = time();
     </div>
 
     <input type="hidden" id="session_date" value="<?php echo $_SESSION["date"] ?>">
-    <input type="hidden" id="formatted_date" value="<?php echo date_format((date_add(date_create($_SESSION["date"]), date_interval_create_from_date_string("1 day"))), 'D, jS M Y'); ?>">
+    <input type="hidden" id="formatted_date" value="<?php echo date('D, jS M Y', strtotime($_SESSION["date"])); ?>">
 
     <form action="compose_messages.php" method="post" id="print_form" target="popup_frame">
         <input type="hidden" id="print_table_date" name="print_table_date">
@@ -191,10 +190,22 @@ $_SESSION["last_activity"] = time();
         var table = document.createElement("table");
         var row_count = 0;
         table.setAttribute("class", "table_view");
-        table.innerHTML += "<tr><th colspan='7' class='table_title'> " +
+        table.innerHTML += "<tr><th colspan='4' class='table_title'> " +
                             $(".list_category_li.active").find("#category_name").html(); + "</th></tr>";
         $(".table_view tr").each(function() {
-            if($(this).css('display') != 'none') {
+            if ($(this).attr("id") == "print_date") {
+                var row = document.createElement("tr");
+                var th = document.createElement("th");
+                var span = document.createElement("span");
+                row.setAttribute("id", "print_date");
+                th.setAttribute("colspan", "4");
+                span.setAttribute("class", "table_date_span");
+                span.innerHTML = $("#formatted_date").val();
+                th.appendChild(span);
+                row.appendChild(th);
+                table.appendChild(row);
+            }
+            else if($(this).css('display') != 'none') {
                 var row = $(this).clone()[0];
                 var cell = "";
                 $(this).children().each(function() {
