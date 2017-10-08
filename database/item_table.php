@@ -206,10 +206,11 @@ class ItemTable extends DatabaseTable {
      * @param  string   $category_name  Name of the category to get items for.
      * @return object|false             Returns mysqli_result object on query success or false if query fails.
      */
-    public static function get_categorized_items($category_name) {
+    public static function get_categorized_items($category_name, $date) {
         $sql = "SELECT Item.name, Item.unit, Item.id FROM Item
                 INNER JOIN Category ON Item.category_id = Category.id
-                WHERE Category.name = '{$category_name}' AND Item.deletion_date IS NULL
+                WHERE Category.name = '{$category_name}'
+                AND (Item.creation_date <= '{$date}' AND (Item.deletion_date > '{$date}' OR Item.deletion_date IS NULL))
                 ORDER BY Item.order_id ASC";
 
        return parent::query($sql);
@@ -220,8 +221,10 @@ class ItemTable extends DatabaseTable {
      *
      * @return object|false     Returns mysqli_result object on query success or false if query fails.
      */
-    public static function get_uncategorized_items() {
-        $sql = "SELECT name, unit, id FROM Item WHERE category_id IS NULL AND deletion_date IS NULL";
+    public static function get_uncategorized_items($date) {
+        $sql = "SELECT name, unit, id FROM Item
+                WHERE category_id IS NULL
+                AND (Item.creation_date <= '{$date}' AND (Item.deletion_date > '{$date}' OR Item.deletion_date IS NULL))";
 
         return parent::query($sql);
     }

@@ -84,7 +84,7 @@ if(isset($_POST["delete_id"])) {
                 <h4 class="font_roboto">Uncategorized Items</h4>
                 <div class="div_list">
                     <ul class="category_list" name="select_uncat" id="uncategorized_list" >
-                    <?php $result = ItemTable::get_uncategorized_items(); ?>
+                    <?php $result = ItemTable::get_uncategorized_items($_SESSION["date"]); ?>
                     <?php while ($row = $result->fetch_assoc()): ?>
                         <li class="list_li" id="<?php echo $row['id'] ?>" item-name="<?php echo $row['name'] ?>"><?php echo $row["name"];?></li>
                     <?php endwhile ?>
@@ -97,6 +97,7 @@ if(isset($_POST["delete_id"])) {
     <form action="edit_categories.php" method="post" id="add_form">
         <input type="hidden" name="new_name" id="new_name">
     </form>
+    <input type="hidden" id="session_date" value="<?php echo $_SESSION["date"] ?>">
 </body>
 </html>
 
@@ -110,9 +111,10 @@ if(isset($_POST["delete_id"])) {
 <script>
     function categorySelect(obj) {
         var categoryName = obj.children[0].innerHTML;
+        var date = $("#session_date").val() ;
         document.getElementById("category_select").value = obj.children[0].innerHTML;
 
-        $.post("jq_ajax.php", {getCategorizedItems: categoryName}, function(data,status){
+        $.post("jq_ajax.php", {getCategorizedItems: categoryName, date: date}, function(data,status){
             document.getElementById("div").innerHTML = data;
             $("#categorized_list").sortable({
                 delay: 50,
@@ -181,7 +183,7 @@ if(isset($_POST["delete_id"])) {
             $(".list_category_li").removeClass("active");
             $(this).addClass("active");
         });
-        
+
         $("#uncategorized_list").sortable({
             delay: 50,
             revert: 120,

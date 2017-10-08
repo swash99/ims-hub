@@ -29,7 +29,7 @@ if (isset($_POST["updateItemQuantity"])) {
 /*-----------------edit_categories.php-------------*/
 if (isset($_POST["getCategorizedItems"])) {
 
-    $result = ItemTable::get_categorized_items($_POST["getCategorizedItems"]);
+    $result = ItemTable::get_categorized_items($_POST["getCategorizedItems"], $_POST["date"]);
     if ($result) {
         echo '<ul class="category_list" id="categorized_list" >';
         while ($row = $result->fetch_assoc()) {
