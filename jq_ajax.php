@@ -167,7 +167,7 @@ if (isset($_POST["getPrintPreview"])) {
         echo '<tr>
                 <td class="item_name">'.$row["name"].'</td>
                 <td>'.$row["unit"].'</td>
-                <td class="td_quantity">'.$row["quantity"].'</td>
+                <td class="td_quantity">'.($row["quantity"] == "" ? "-" : $row["quantity"]).'</td>
                 <td id="td_notes">'.$row["notes"].'</td>
                 <input type="hidden" value='.$row["id"].'>
                 <input type="hidden" id="cat_id" value='.$row["cat_id"].'>
