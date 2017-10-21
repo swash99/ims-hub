@@ -5,6 +5,7 @@ require_once "database/user_role_table.php";
 require_once "database/category_table.php";
 require_once "database/item_table.php";
 require_once "database/inventory_table.php";
+require_once "database/invoice_table.php";
 require_once "database/conversation_table.php";
 require_once "database/notification_status_table.php";
 require_once "database/sub_notification_status_table.php";
@@ -240,8 +241,88 @@ if (isset($_POST["printAll"])) {
     }
 }
 
+if (isset($_POST["showInvoiceList"])) {
+    $result = InvoiceTable::get_tracked_invoices($_POST["database"]);
+    while ($row = $result->fetch_assoc()) {
+        $date = date_add(date_create($row["date"]), date_interval_create_from_date_string("1 day"));
+    echo '<li>
+            <a class="invoice_date" onclick="showInvoice(this)">
+                <div id="left">
+                    <span>'.date_format($date, "jS").'</span>
+                </div>
+                <div id="right">
+                    <span id="top">'.date_format($date, "F").'</span>
+                    <span id="bottom">'.date_format($date, "D Y").'</span>
+                </div>
+                <input type="hidden" id="selected_date" value="'.date_format($date, "D, jS M Y").'">
+                <input type="hidden" id="created_date" value="'.date_format(date_create($row["date"]), "jS M Y").'">
+            </a>
+            <input type="hidden" value="'.$row["date"].'">
+            <input type="hidden" id="database_name" value="'.$_POST["database"].'">
+            <input type="hidden" id="invoice_id" value="'.$row["id"].'">
+        </li>';
+    }
+}
+
+if (isset($_POST["getTrackedInvoice"])) {
+    $result = InvoiceTable::get_invoice_table($_POST["date"], $_POST["database"]);
+    $current_category = null;
+    while ($row = $result->fetch_assoc()) {
+        if ($row["category_name"] != $current_category AND $row["category_name"] != null) {
+            $current_category = $row["category_name"];
+            echo '<tbody class="print_tbody" id="print_tbody">
+                    <tr id="category"><td colspan="7" class="table_heading">'.$row["category_name"].'</td></tr>
+                    <tr id="category_columns">
+                        <th>Status</th>
+                        <th>Item</th>
+                        <th>Unit</th>
+                        <th>Quantity Required</th>
+                        <th>Quantity Delivered</th>
+                        <th>Cost</th>
+                        <th>Notes</th>
+                    </tr>';
+        }
+                    $quantity_required = $row["quantity_custom"] == "" ? $row["quantity_required"] : $row["quantity_custom"];
+                    $quantity_required = $quantity_required == "" ? "-" : $quantity_required;
+                    $cost = is_numeric($row["cost_delivered"]) ? "$ ".$row["cost_delivered"] : "-";
+                    $delivered_warning = "";
+
+                    if ($quantity_required == $row["quantity_delivered"]) {
+                        $cell_class = "marked";
+                        $text = "delivered";
+                    } else if ($row["quantity_delivered"] != "" && $quantity_required != $row["quantity_delivered"]) {
+                        $cell_class = "marked_warning";
+                        $text = "delivered <br> discrepancy";
+                        $delivered_warning = "field_warning";
+                    } else {
+                        $cell_class = "";
+                        $text = "not delivered";
+                    }
+
+        echo    '<tr id="column_data" class="row">
+                    <td class="row_mark '.$cell_class.'">
+                        <span class="icon entypo-cancel"></span>
+                        <span class="text">'.$text.'</span>
+                    </td>
+                    <td id="item_name">'.$row["item_name"].'</td>
+                    <td>'.$row["unit"].'</td>
+                    <td id="quantity_required">'.$quantity_required.'</td>
+                    <td class="'.$delivered_warning.'"><input  onchange="markCustom(this); updateQuantity(this);" type="number" id="quantity_delivered" value="'.$row["quantity_delivered"].'" '.$readonly.' '.($row["quantity_delivered"] != "" ? "readonly" : "").' ></td>
+                    <td class="cost">'.$cost.'</td>
+                    <td id="td_notes">
+                        <textarea name="" id="" rows="2" onchange="updateNotes(this)" value="'.$row["invoice_notes"].'" '.$readonly.' >'.$row["invoice_notes"].'</textarea>
+                    </td>
+                    <input type="hidden" id="item_id" value="'.$row["item_id"].'">
+                </tr>';
+    }
+}
+
 if (isset($_POST["updateItems"])) {
     echo ItemTable::update_item_details($_POST["itemId"], $_POST["itemName"], $_POST["itemUnit"]);
+}
+
+if (isset($_POST["updateCostDelivered"])) {
+    echo InvoiceTable::update_cost_delivered($_POST["cost"], $_POST["itemId"], $_POST["date"], $_POST["database"]);
 }
 
 if (isset($_POST["addGroupUser"])) {
@@ -261,7 +342,21 @@ if (isset($_POST["getGroupUsers"])) {
         }
     }
 }
-
+if (isset($_POST["getItemPrice"])) {
+    echo InvoiceTable::get_item_price($_POST["itemId"], $_POST["database"]);
+}
+if (isset($_POST["markInvoiceRead"])) {
+    echo InvoiceTable::mark_invoice_read($_POST["id"], $_POST["status"], $_POST["database"]);
+}
+if (isset($_POST["getUnreadCount"])) {
+    echo InvoiceTable::get_unread_count($_POST["database"]);
+}
+if (isset($_POST["updateQuantityDelivered"])) {
+    echo InvoiceTable::update_quantity_delivered($_POST["quantity"], $_POST["itemId"], $_POST["date"], $_POST["database"]);
+}
+if (isset($_POST["updateInvoiceNotes"])) {
+    echo InvoiceTable::update_invoice_note($_POST["note"], $_POST["itemId"], $_POST["date"], $_POST["database"]);
+}
 if (isset($_POST["setNotiStatus"])) {
     echo NotificationStatusTable::set_notification_status($_POST["user_name"], $_POST["notification_id"], $_POST["status"]);
 }

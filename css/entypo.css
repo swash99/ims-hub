@@ -22,3 +22,5 @@
 .entypo-info:before{ content: '\e820'; }
 .entypo-paper:before{ content: '\e84e'; }
 .entypo-pencil:before{ content: '\e837'; }
+.entypo-check:before{ content: '\e813'; }
+.entypo-cancel:before{ content: '\e814'; }

@@ -1,5 +1,6 @@
 <?php
 require_once "database/conversation_table.php";
+require_once "database/invoice_table.php";
 
 if (isset($_POST["logout"])) {
     session_start();
@@ -13,6 +14,7 @@ if(isset($_POST["dateview"])) {
 }
 if(isset($_SESSION["username"])) {
     $unread_count = ConversationTable::count_unread_conversations($_SESSION["username"]);
+    $invoice_total_count = InvoiceTable::get_unread_count("Waterloo") + InvoiceTable::get_unread_count("Mississauga");
 }
 ?>
 
@@ -30,6 +32,15 @@ if(isset($_SESSION["username"])) {
                 <span class="home" id="text">Message</span>
                 <div class="noti_dot">
                     <span><?php echo $unread_count?></span>
+                </div>
+            </a>
+        </li>
+        <li class=<?php if (isset($page) AND ($page == "invoice")) {echo "active";} ?> id="invoice">
+            <a href="invoice.php">
+                <span class="fa-file-text"></span>
+                <span class="home" id="text">Invoice</span>
+                <div class="noti_dot">
+                    <span><?php echo $invoice_total_count?></span>
                 </div>
             </a>
         </li>
@@ -74,11 +85,13 @@ if(isset($_SESSION["username"])) {
             $("ul", this).slideUp(150, "linear");
         });
 
-        if (!$("#messages").hasClass("active")) {
-            if($(".noti_dot span").html() > 0) {
-                $(".noti_dot").addClass("show");
+        $(".noti_dot").each(function() {
+            if (!$(this).parents("li").hasClass("active")) {
+                if ($(this).children().html() > 0) {
+                    $(this).addClass("show");
+                }
             }
-        }
+        });
 
     });
 </script>

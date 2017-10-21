@@ -704,6 +704,7 @@ input:-moz-read-only::-moz-placeholder{
     transition: border 0.25s;
     text-transform: uppercase;
     color: #555;
+    cursor: pointer;
 }
 .button_flat:hover{
     color: #79bc4d;
@@ -985,7 +986,7 @@ input:-moz-read-only::-moz-placeholder{
     font-family: "Open Sans";
 }
 #print_suppliers{
-    padding: 19.5px 0px;
+    padding: 14.5px 0px;
 }
 .div_item_list h4{
     padding: 10px 0px;
@@ -1114,6 +1115,58 @@ input:-moz-read-only::-moz-placeholder{
 }
 .row_icon .text{
     font-size: 11px;
+}
+.table_view .status_warning{
+    background: #ffeded;
+    transition: background 0.25s;
+}
+.table_view .field_warning, .field_warning input{
+    position: relative;
+    color: red;
+    font-weight: bold;
+}
+.table_view .field_warning:after{
+    content: "discrepancy";
+    position: absolute;
+    bottom: 5%;
+    left: 0;
+    right: 0;
+    font-size: 10px;
+    text-transform: uppercase;
+}
+.table_view .row_mark{
+    width: 100px;
+    padding: 0px 2px;
+    box-sizing: border-box;
+    color: #999;
+    border-top: 1px solid white;
+    cursor: pointer;
+    transition: background 0.25s;
+}
+.row_mark span{
+    display: block;
+}
+.row_mark .icon:before,{
+    font-size: 30px;
+}
+.row_mark.marked .icon:before{
+    content: "\e813";
+}
+.row_mark.marked_warning .icon:before{
+    content: "\f12a";
+    font-family: "FontAwesome";
+}
+.row_mark.marked_warning{
+    background: #e05d33;
+    color: white;
+}
+.row_mark .text{
+    font-size: 10px;
+    text-transform: uppercase;
+}
+.row_mark.marked{
+    background: #79bc4d;
+    color: white;
 }
 .tr_confirm{
     display: none;
@@ -1364,6 +1417,7 @@ td.table_heading{
     border-bottom: 1px solid #cecece;
 }
 .table_view input{
+    background: transparent;
     border: 1px solid transparent;
     border-bottom: 1px solid #bfbfbf;
     margin: 5px 5px;
@@ -1388,6 +1442,7 @@ td.table_heading{
     border: 1px solid red;
 }
 .table_view textarea{
+    background: transparent;
     padding: 2px 4px;
     width: 90%;
     font-size: 17px;
@@ -1464,6 +1519,10 @@ td.table_heading{
 #round_tr #round_input{
     min-width: 30px;
     max-width: 60px;
+}
+#table_date_span{
+    display: block;
+    padding: 5px 0px;
 }
 .print_table_date{
     display: block;
@@ -2198,68 +2257,74 @@ input:focus{
     margin: 5px 0px!important;
     position: relative;
 }
-.print_preview{
-    overflow: visible;
-    background: white;
+.side_nav .left{
+    flex: 5;
 }
-.print_preview #catering_option, .print_preview #inventory{
-    display: flex;
-    padding: 0px 0px 0px 5px!important;
-}
-.print_preview a.active{
-    border-right: none!important;
-}
-.print_preview #left{
-    flex: 4;
-    line-height: 40px;
-    margin-right: 5px;
-}
-.print_preview #right{
+.side_nav .right {
     flex: 1;
-    display: inline-block;
-    padding: 6px 0px;
-    vertical-align: middle;
-    font-size: 20px;
     text-align: center;
-    border: 1px solid #cecece;
-    border-right: none;
-    background: #f1f1f1;
-    z-index: 2;
 }
-.print_preview .status_view{
+.side_nav .right.counter{
+    background: #79bc4d;
+    border-radius: 4px;
+    color: white;
+    font-size: 15px;
     display: flex;
-    position: absolute;
-    left: 100%;
-    height: 40px;
-    background: white;
-    box-sizing: border-box;
-    padding: 0px 15px 0px 5px;
-    color: #555;
-    font-size: 12px;
     align-items: center;
-    min-width: 150px;
-    border: 1px solid #79bc4d;
-    transform: translateX(-100%);
-    transition: transform 0.25s cubic-bezier(0.25, 0.46, 0.18, 0.91);
-    z-index: -1;
+    justify-content: center;
 }
-.print_preview .status_view.visible{
-    transform: translateX(0);
-    transition-delay: 0.5s;
+.sidenav #list_back{
+    font-size: 14px;
+    background: #f4f4f4;
+    margin: 0;
+    padding: 10px;
+    border-top: 1px solid #cecece;
 }
-.print_preview .status_view #item_num{
-    font-size: 20px;
+#div_invoice_resturants{
+    flex: 1;
+    transition: transform 0.35s;
 }
-.print_preview #right.warning{
+#div_invoice_list{
+    display: none;
+    left: 0;
+    flex: 1;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    position: absolute;
+}
+#div_invoice_list:before{
+    content: "";
+    display: block;
+    background: rgba(0, 0, 0, 0.55);
+    position: absolute;
+    width: 100%;
+    height: 100%;
     opacity: 0;
-    transition: opacity 0.25s;
-    background: #79bc4d!important;
-    color: white!important;
-    border: 1px solid #79bc4d;
+    transition: opacity 0.3s;
 }
-.print_preview li:hover #right{
-    border: 1px solid transparent!important;
-    border-left: 1px solid #cecece!important;
+.div_list_visible{
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    background: white;
+    padding-right: 7%;
+    -webkit-transform: translateX(100%);
+    transform: translateX(100%);
+    transition: transform 0.25s;
+}
+.invoice_list{
+    flex: 1;
+}
+#Waterloo_list, #Mississauga_list{
+    display: none;
+}
+#div_invoice_list.list_visible .div_list_visible{
+    -webkit-transform: translateX(7%);
+    transform: translateX(7%);
+}
+.list_visible:before{
+    opacity: 1!important;
 }
 #message_sidenav a{
     padding-left: 40px;
@@ -2592,6 +2657,8 @@ input:focus{
     background-color: white;
     min-width: 100px;
     box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+    z-index: 99;
+    cursor: pointer;
 }
 .option{
     display: inline-block;
@@ -3071,7 +3138,7 @@ input:focus{
     display: block;
     position: absolute;
     top: 14px;
-    left: 49px;
+    left: 46px;
     border-radius: 9px;
     background: #79bc4d;
     padding: 0;
@@ -3121,12 +3188,17 @@ input:focus{
     top: 2px;
     right: 5px;
 }
-.sidenav #heading{
+.sidenav .heading{
     text-align: center;
     padding: 9px 0px;
     border-bottom: 1px solid #cecece;
 }
-#heading h4{
+.sidenav .div_list_con{
+    display: flex;
+    flex: 1;
+    position: relative;
+}
+.heading h4{
     padding: 1.5px;
     font-size: 14px;
     text-transform: uppercase;
@@ -3146,19 +3218,20 @@ input:focus{
     border-left: none;
     border-right: none;
     cursor: pointer;
+    font-family: "Roboto";
 }
 .sidenav li .image, .sidenav li .text{
     display: flex;
     align-items: center;
     padding: 0px 5px;
 }
-.sidenav .left{
+#sideNav .left{
     min-width: 48px;
     max-width: 48px;
     box-sizing: border-box;
     border-right: 1px solid #cecece;
 }
-.sidenav .right{
+#sideNav .right{
     border-bottom: 1px solid #cecece;
 }
 .sidenav .side_date{

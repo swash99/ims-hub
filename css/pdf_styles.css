@@ -1,8 +1,7 @@
 .table_view{
-    position: relative;
     width: 100%;
     margin: 0;
-    border-collapse:collapse;
+    border: none;
     border-bottom: 1px solid #cecece;
     background: white;
 }
@@ -27,6 +26,7 @@
 .table_view .heading{
     font: 14px;
     background: #f4f4f5;
+    border-top: 1px solid #cecece;
     border-bottom: 1px solid #cecece;
 }
 .table_view td{
@@ -38,6 +38,25 @@
     max-width: 200px;
     word-wrap: break-word;
     font-size: 15px;
+}
+.table_view td.field_warning{
+    background: #e05d33;
+    color: white;
+}
+.table_view td.row_mark{
+    background: #f4f4f5;
+    width: 90px;
+    box-sizing: border-box;
+    font-size: 11px;
+    text-transform: uppercase;
+}
+.table_view td.marked{
+    background: #79bc4d!important;
+    color: white;
+}
+.table_view td.marked_warning{
+    background: #e05d33!important;
+    color: white;
 }
 .table_heading{
     background: #f4f4f5;
