@@ -206,10 +206,9 @@ class ItemTable extends DatabaseTable {
      * @param  string   $category_name  Name of the category to get items for.
      * @return object|false             Returns mysqli_result object on query success or false if query fails.
      */
-    public static function get_categorized_items($category_name, $date) {
+    public static function get_categorized_items($category_id, $date) {
         $sql = "SELECT Item.name, Item.unit, Item.id FROM Item
-                INNER JOIN Category ON Item.category_id = Category.id
-                WHERE Category.name = '{$category_name}'
+                WHERE category_id = $category_id
                 AND (Item.creation_date <= '{$date}' AND (Item.deletion_date > '{$date}' OR Item.deletion_date IS NULL))
                 ORDER BY Item.order_id ASC";
 
@@ -238,18 +237,10 @@ class ItemTable extends DatabaseTable {
      * @param  string   $item_name      Name of the item to assign a category for.
      * @return boolean                  Returns true on query success and false if it fails.
      */
-    public static function update_items_category($category_name, $item_name) {
-        $category_id = null;
-
-        if ($category_name != null) {
-            $sql = "SELECT Category.id FROM Category
-                    WHERE Category.name = '$category_name' AND deletion_date IS NULL";
-
-            if ($result = parent::query($sql)) {
-                $category_id = $result->fetch_assoc()['id'];
-            }
-        }
-        $sql = "UPDATE Item SET category_id =" .($category_id == null ? "null":$category_id). " WHERE name = '$item_name'";
+    public static function update_items_category($category_id, $item_id) {
+        $category_id = $category_id == "" ? 'null' : $category_id;
+        $sql = "UPDATE Item SET category_id = $category_id 
+        WHERE id = $item_id";
 
         return parent::query($sql);
     }

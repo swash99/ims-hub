@@ -1,6 +1,7 @@
 <?php
 session_start();
 require_once "database/category_table.php";
+require_once "database/supplier_table.php";
 require_once "database/item_table.php";
 
 if (!isset($_SESSION["username"])) {
@@ -37,9 +38,8 @@ $readonly = $_SESSION["date"] <= date('Y-m-d', strtotime("-".$_SESSION["history_
     <link rel="stylesheet" href="styles.css">
 </head>
 <body class="overflow_hidden">
-
     <div class="main">
-        <div class="div_category " id="home_list">
+        <div class="sidenav " id="home_list">
             <?php $current_date = strtotime($_SESSION["date"]); ?>
             <div class="time_div font_open_sans">
                 <div class="time_div_container">
@@ -60,22 +60,29 @@ $readonly = $_SESSION["date"] <= date('Y-m-d', strtotime("-".$_SESSION["history_
                     <span >Suppliers</span>
                 </div>
             </div>
-            <ul class="category_list home_category_list font_roboto" >
-            <?php $result = CategoryTable::get_categories($_SESSION["date"]);
-                 while ($row = $result->fetch_assoc()): ?>
-                 <li class="list_category_li home_category_list_li">
-                    <div class="list_li_div_left">
-                        <span id="category_name"><?php echo $row["name"]; ?></span>
+            <div class="div_list_con">
+                <div id="div_invoice_restaurants">
+                    <ul id="supplier_list">
+                    <?php $result = SupplierTable::get_suppliers($_SESSION["date"]);
+                         while ($row = $result->fetch_assoc()): ?>
+                         <li class="list_category_li supplier_list_li">
+                            <div class="list_li_div_left">
+                                <span id="category_name"><?php echo $row["name"]; ?></span>
+                            </div>
+                            <input type="hidden" id="supplier_id" value="<?php echo $row["id"]; ?>">
+                         </li>
+                    <?php endwhile ?>
+                    </ul>
+                </div>
+                <div id="div_invoice_list">
+                    <div class="div_list_visible">
+                        <div class="heading" ><h4>Categories</h4></div>
+                        <ul class="side_nav invoice_list" id="category_list">
+                        </ul>
+                        <button class="button_flat" id="list_back">Back</button>
                     </div>
-                    <div class="list_li_div_right">
-                        <span class="count_span_filled" id="<?php echo $row['name'].'_count' ?>">
-                        <?php echo ItemTable::get_updated_items_count($row['id'], $_SESSION["date"]) ?></span>
-                        <span class="count_span_total"><?php echo ItemTable::get_total_items($row['id'], $_SESSION['date']) ?></span>
-                        <input type="hidden" id="category_id" name="category_id" value="<?php echo $row['id'] ?>">
-                    </div>
-                 </li>
-            <?php endwhile ?>
-            </ul>
+                </div>
+            </div>
         </div>
         <div class="inventory_div">
             <div class="inventory_toolbar font_roboto">
@@ -120,21 +127,40 @@ $readonly = $_SESSION["date"] <= date('Y-m-d', strtotime("-".$_SESSION["history_
 
     <input type="hidden" id="session_date" value="<?php echo $_SESSION["date"]; ?>">
     <input type="hidden" id="date_check" value="<?php echo isset($_SESSION["date_check"]); ?>">
-     <?php $page = "home";
-           include_once "new_nav.php"; ?>
+
+<script type="text/javascript" src="jq/jquery-3.2.1.min.js"></script>
+ <?php $page = "home";
+       include_once "new_nav.php"; ?>
 </body>
 </html>
-
-<script type="text/javascript" src="//code.jquery.com/jquery-2.2.0.min.js"></script>
+<script src="jq/jquery-ui.min.js"></script>
 <script src="https://cdn.rawgit.com/alertifyjs/alertify.js/v1.0.10/dist/js/alertify.js"></script>
-<script
-      src="http://code.jquery.com/ui/1.12.1/jquery-ui.min.js"
-      integrity="sha256-VazP97ZCwtekAsvgPBSUwPFKdrwD3unUfSGVYrahUqU="
-      crossorigin="anonymous"></script>
 <?php if ($_SESSION["date"] <= date('Y-m-d', strtotime("-".$_SESSION["history_limit"]))): ?>
     <script> $("input:not(#search_bar)").prop("readonly", true); </script>
 <?php endif ?>
 <script>
+    function getCategories(obj) {
+        var supplierId = $(obj).find("#supplier_id").val();
+        var date = document.getElementById("session_date").value;
+        $.post("jq_ajax.php", {getSupplierCategory: "", supplierId: supplierId, date: date}, function(data) {
+            $(".div_actual_sales").find("#left span").html($(".supplier_list_li.active").find("#category_name").html());
+            $("#category_list").html(data);
+            $("#div_invoice_list").css("display", "flex");
+            setTimeout(function() {
+                $("#div_invoice_list").addClass("list_visible");
+            }, 10);
+            $(".div_list_visible").on("transitionend", function() {
+                $(".category_list_li:first").each(function() {
+                    getInventory($(this).find("#category_id").val(), function() {
+                        $(".search_bar").val("");
+                    });
+                    $(this).addClass("active");
+                    $("#name").html($(this).find("#category_name").html());
+                });
+                $(this).unbind("transitionend");
+            });
+        });
+    }
     function getInventory(categoryId , callBack) {
         var date = document.getElementById("session_date").value;
         if ($("#item_tbody").html() == "") {
@@ -201,7 +227,7 @@ $readonly = $_SESSION["date"] <= date('Y-m-d', strtotime("-".$_SESSION["history_
                 }
             });
         } else {
-            getInventory($(".list_category_li.active").find("#category_id").val());
+            getInventory($("#category_list .active").find("#category_id").val());
         }
     }
 
@@ -312,17 +338,17 @@ $readonly = $_SESSION["date"] <= date('Y-m-d', strtotime("-".$_SESSION["history_
     }
 
     $(document).ready(function() {
-        $(".list_category_li:first").each(function() {
-            getInventory($(this).find("#category_id").val());
+        $(".supplier_list_li").click(function() {
+            getCategories($(this)[0]);
+            $("#supplier_list").children().removeClass("active");
             $(this).addClass("active");
-            $("#name").html($(this).find("#category_name").html());
         });
 
-        $(".list_category_li").click(function() {
+        $(document).on("click", ".category_list_li", function() {
             getInventory($(this).find("#category_id").val(), function() {
                 $(".search_bar").val("");
             });
-            $(".list_category_li").removeClass("active");
+            $("#category_list").children().removeClass("active");
             $(this).addClass("active");
             $("#name").html($(this).find("#category_name").html());
         });
@@ -371,7 +397,7 @@ $readonly = $_SESSION["date"] <= date('Y-m-d', strtotime("-".$_SESSION["history_
             });
         });
 
-        $("input[type=number]").on("keypress" , function(event) {
+        $(document).on("keypress", "input[type=number]" , function(event) {
             if ((event.which < 46 || event.which > 57) && (event.which != 8 &&
                 event.which != 0 && event.which != 13)) {
                 event.preventDefault();
@@ -381,6 +407,18 @@ $readonly = $_SESSION["date"] <= date('Y-m-d', strtotime("-".$_SESSION["history_
         $("#popup_close").click(function() {
             $("#sales_popup").css("display", "none");
             $("#total_input").val($("#right #amount").html());
+        });
+
+        $("#list_back").click(function() {
+            $("#div_invoice_list").removeClass("list_visible");
+            $("#div_invoice_list").on("transitionend", function() {
+                $(".search_bar").val("");
+                $("#name").html("");
+                $("#item_tbody").children().hide();
+                $(".div_actual_sales").find("#left span").html("Suppliers");
+                $("#supplier_list").children().removeClass("active");
+                $(this).css("display", "none").unbind("transitionend");
+            });
         });
     });
 </script>

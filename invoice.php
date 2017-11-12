@@ -37,10 +37,10 @@ $_SESSION["last_activity"] = time();
 <body class="overflow_hidden font_open_sans">
     <div class="main overflow_hidden">
         <div class="sidenav" id="invoice_sidenav">
-            <div class="heading" id="heading"><h4>Resturants</h4></div>
+            <div class="heading" id="heading"><h4>restaurants</h4></div>
             <div class="div_list_con">
-                <div id="div_invoice_resturants">
-                    <ul class="side_nav" id="invoice_resturants">
+                <div id="div_invoice_restaurants">
+                    <ul class="side_nav" id="invoice_restaurants">
                         <li>
                             <a onclick="showInvoiceList(this)">
                                 <span class="left" id="Waterloo">Waterloo</span>
@@ -139,7 +139,7 @@ $_SESSION["last_activity"] = time();
                 <table class="table_view" id="invoice_table">
                     <tr id="print_date" class="row">
                         <th colspan="7">
-                            <span id="table_date_span">click on resturant to see invoice list</span>
+                            <span id="table_date_span">click on restaurant to see invoice list</span>
                             <div class="print_table_date"></div>
                         </th>
                     </tr>
@@ -170,12 +170,12 @@ $_SESSION["last_activity"] = time();
         <input type="hidden" id="table_name" name="table_name">
     </form>
 
-    <?php $page = "invoice";
-    include_once "new_nav.php" ?>
+
+<script type="text/javascript" src="jq/jquery-3.2.1.min.js"></script>
+ <?php $page = "home";
+       include_once "new_nav.php"; ?>
 </body>
 </html>
-
-<script type="text/javascript" src="//code.jquery.com/jquery-2.2.0.min.js"></script>
 <script src="https://cdn.rawgit.com/alertifyjs/alertify.js/v1.0.10/dist/js/alertify.js"></script>
 <script>
 
@@ -445,8 +445,8 @@ $_SESSION["last_activity"] = time();
                 $(this).css("display", "none").unbind("transitionend");
                 $('.invoice_list li a').removeClass("active");
                 $(".invoice_list").css("display", "none");
-                $("#heading").children().html("Resturants");
-                $("#table_date_span").html("click on resturant to see invoice list");
+                $("#heading").children().html("restaurants");
+                $("#table_date_span").html("click on restaurant to see invoice list");
                 $(".print_table_date").html("");
                 $(".print_tbody").remove();
             });

@@ -3,7 +3,7 @@
 -- http://www.phpmyadmin.net
 --
 -- Host: 127.0.0.1
--- Generation Time: Oct 21, 2017 at 05:13 PM
+-- Generation Time: Nov 12, 2017 at 03:05 PM
 -- Server version: 5.6.17
 -- PHP Version: 5.5.12
 
@@ -29,12 +29,13 @@ SET time_zone = "+00:00";
 CREATE TABLE IF NOT EXISTS `Category` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `order_id` int(11) NOT NULL DEFAULT '0',
+  `supplier_id` int(11) NOT NULL,
   `name` varchar(45) NOT NULL,
   `creation_date` date NOT NULL,
   `deletion_date` date DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `id_UNIQUE` (`id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=9 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=27 ;
 
 -- --------------------------------------------------------
 
@@ -86,7 +87,7 @@ CREATE TABLE IF NOT EXISTS `Inventory` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   PRIMARY KEY (`item_id`,`date`),
   UNIQUE KEY `id` (`id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=3547 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=3562 ;
 
 -- --------------------------------------------------------
 
@@ -178,6 +179,22 @@ CREATE TABLE IF NOT EXISTS `SubNotificationStatus` (
   UNIQUE KEY `id` (`id`),
   UNIQUE KEY `id_2` (`id`)
 ) ENGINE=MyISAM  DEFAULT CHARSET=latin1 AUTO_INCREMENT=7 ;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `Suppliers`
+--
+
+CREATE TABLE IF NOT EXISTS `Suppliers` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `order_id` int(11) NOT NULL DEFAULT '0',
+  `name` varchar(45) NOT NULL,
+  `creation_date` date NOT NULL,
+  `deletion_date` date DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `id_UNIQUE` (`id`)
+) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=21 ;
 
 -- --------------------------------------------------------
 

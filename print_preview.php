@@ -1,6 +1,7 @@
 <?php
 session_start();
 require_once "database/category_table.php";
+require_once "database/supplier_table.php";
 require_once "mpdf/vendor/autoload.php";
 
 if (!isset($_SESSION["username"])) {
@@ -54,15 +55,19 @@ $_SESSION["last_activity"] = time();
         </div>
     </div>
     <div class="main overflow_hidden">
-            <div class="div_category">
-                <h4 id="print_suppliers">Suppliers</h4>
-                <ul class="category_list home_category_list font_roboto" >
-                <?php $result = CategoryTable::get_categories($_SESSION["date"]);
-                     while ($row = $result->fetch_assoc()): ?>
-                     <li class="list_category_li">
-                        <span id="category_name"><?php echo $row["name"]; ?></span>
-                        <input type="hidden" id="category_id" name="category_id" value="<?php echo $row['id'] ?>">
-                     </li>
+            <div class="sidenav">
+                <div class="heading">
+                    <h4 id="print_suppliers">Suppliers</h4>
+                </div>
+                <ul class="home_category_list font_roboto" >
+                <?php $result = SupplierTable::get_suppliers($_SESSION["date"]);
+                    while ($row = $result->fetch_assoc()): ?>
+                    <li class="list_category_li">
+                        <div class="list_li_div_left">
+                                <span id="category_name"><?php echo $row["name"]; ?></span>
+                        </div>
+                        <input type="hidden" id="supplier_id" name="supplier_id" value="<?php echo $row['id'] ?>">
+                    </li>
                 <?php endwhile ?>
             </ul>
             </div>
@@ -74,13 +79,6 @@ $_SESSION["last_activity"] = time();
                             <span id="table_date_span"><?php echo date('D, jS M Y', strtotime($_SESSION["date"])); ?></span>
                         </th>
                     </tr>
-                    <tr class="heading">
-                        <th>Item</th>
-                        <th>Unit</th>
-                        <th>Quantity</th>
-                        <th>Notes</th>
-                    </tr>
-                    <tbody class="font_roboto" id="item_tbody"></tbody>
                 </table>
             </div>
     </div>
@@ -112,34 +110,19 @@ $_SESSION["last_activity"] = time();
 </body>
 </html>
 
-<script type="text/javascript" src="//code.jquery.com/jquery-2.2.0.min.js"></script>
+<script type="text/javascript" src="jq/jquery-3.2.1.min.js"></script>
 <?php if ($_SESSION["date"] <= date('Y-m-d', strtotime("-".$_SESSION["history_limit"]))): ?>
     <script> $("input").prop("readonly", true); </script>
 <?php endif ?>
 <script>
 
-    function getInventory(categoryId , callBack) {
-        var date = document.getElementById("session_date").value;
-        if ($("#item_tbody").html() == "") {
-            $.post("jq_ajax.php", {getPrintPreview: "", categoryId: categoryId, date: date}, function(data, status) {
-                document.getElementById("item_tbody").innerHTML = data;
-                $("#item_tbody").children().hide();
-                $("#item_tbody").children().each(function() {
-                    if ($(this).find("#cat_id").val() == categoryId) {
-                        $(this).show();
-                    }
-                });
-            });
-        } else {
-            $("#item_tbody").children().hide();
-            $("#item_tbody").children().each(function() {
-                if ($(this).find("#cat_id").val() == categoryId) {
-                    $(this).show();
-                }
-            });
-        }
-        typeof callBack === "function" ? callBack() : "";
-        if ($("#toolbar_toggle .switch-input").prop("checked")) { checkRequired(); }
+    function getInventory(supplierId , callBack) {
+        $.post("jq_ajax.php", {getPrintPreview: "", supplierId: supplierId}, function(data, status) {
+            $(".print_tbody").remove();
+            $("#print").append(data);
+            typeof callBack === "function" ? callBack() : "";
+            if ($("#toolbar_toggle .switch-input").prop("checked")) { checkRequired(); }
+        });
     }
 
     function updateNotes(obj) {
@@ -209,25 +192,37 @@ $_SESSION["last_activity"] = time();
 
     function checkRequired() {
         if ($("#toolbar_toggle .switch-input").prop("checked")) {
-            $(".td_quantity").each(function() {
-              if ((this.innerHTML <=0 || this.innerHTML == "-") && $(this).nextAll("#td_notes").html() == "") {
-                $(this).parent().hide();
-              }
+            $(".print_tbody").each(function() {
+                var total = $(this).find(".td_quantity").length;
+                var remove = 0;
+                $(this).find(".td_quantity").each(function() {
+                    if ((this.innerHTML <=0 || this.innerHTML == "-") && $(this).nextAll("#td_notes").html() == "") {
+                        $(this).parent().hide();
+                        remove++;
+                    }
+                });
+                if (total - remove == 0) {
+                    $(this).hide();
+                    $(this).children().hide();
+                }
             });
         } else {
-            getInventory($(".list_category_li.active").find("#category_id").val());
+            $(".print_tbody").each(function() {
+                $(this).show();
+                $(this).find("tr").show();
+            });
         }
     }
 
     $(document).ready(function() {
 
         $(".list_category_li:first").each(function() {
-            getInventory($(this).find("#category_id").val());
+            getInventory($(this).find("#supplier_id").val());
             $(this).addClass("active");
         });
 
         $(".list_category_li").click(function() {
-            getInventory($(this).find("#category_id").val());
+            getInventory($(this).find("#supplier_id").val());
             $(".list_category_li").removeClass("active");
             $(this).addClass("active");
         });

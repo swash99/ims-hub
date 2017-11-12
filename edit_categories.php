@@ -1,6 +1,7 @@
 <?php
 session_start();
 require_once "database/category_table.php";
+require_once "database/supplier_table.php";
 require_once "database/item_table.php";
 
 if (!isset($_SESSION["username"])) {
@@ -22,19 +23,6 @@ if (isset($_SESSION["last_activity"]) && $_SESSION["last_activity"] + $_SESSION[
 exit();
 }
 $_SESSION["last_activity"] = time();
-
-if (isset($_POST["new_name"]) AND !empty($_POST["new_name"])) {
-    try {
-        if (!CategoryTable::add_category($_POST["new_name"], $_SESSION["date"])) {
-            echo '<div class="error">Category already exists</div>';
-        }
-    } catch (Exception $e) {
-        echo '<div class="error">'.$e->getMessage().'</div>';
-    }
-}
-if(isset($_POST["delete_id"])) {
-    CategoryTable::remove_category($_POST["delete_id"], $_SESSION["date"]);
-}
 ?>
 
 <!DOCTYPE html>
@@ -49,30 +37,47 @@ if(isset($_POST["delete_id"])) {
         <div class="div_category">
             <h4 class="font_roboto">Suppliers</h4>
             <div class="div_list_category">
-            <ul class="category_list" id="category_list">
-                <?php $result = CategoryTable::get_categories($_SESSION["date"]) ?>
-                <?php while ($row = $result->fetch_assoc()): ?>
-                    <li id="<?php echo $row['id']?>" class="list_category_li" onclick=categorySelect(this)>
-                        <span><?php echo $row["name"]?></span>
-                        <form action="edit_categories.php" method="post">
-                            <input type="hidden" name="delete_id" value="<?php echo $row['id']?>" >
-                        </form>
-                    </li>
-                <?php endwhile ?>
-            </ul>
+                <ul class="category_list" id="supplier_list">
+                    <?php $result = SupplierTable::get_suppliers($_SESSION["date"]) ?>
+                    <?php while ($row = $result->fetch_assoc()): ?>
+                        <li id="<?php echo $row['id']?>" class="list_category_li supplier_li" onclick=supplierSelect(this)>
+                            <span><?php echo $row["name"]?></span>
+                            <form action="edit_categories.php" method="post">
+                                <input type="hidden" name="supplier_delete_id" value="<?php echo $row['id']?>" >
+                            </form>
+                        </li>
+                    <?php endwhile ?>
+                </ul>
+            </div>
+            <input type="hidden" id="supplier_select">
+            <input type="hiddden" id="delete_cat_ids">
+            <div class="category_add" id="category_add">
+                <button class="button_flat entypo-trash float_left" onclick=deleteSupplier()>delete</button>
+                <button class="button_flat entypo-plus float_right" id="slide_supplier" onclick=openDrawer(this)>Add</button>
+            </div>
+            <div class="category_add_drawer" id="add_supplier">
+                <input class="category_input" type="text" name="category" id="supplier_name" placeholder="Supplier Name">
+                <button name="add_button" class="button" onclick=addSupplier()>Add</button>
+                <button class="button_cancel" onclick=closeDrawer(this)>close</button>
+            </div>
+        </div>
+        <div class="div_category">
+            <h4 class="font_roboto">Categories</h4>
+            <div class="div_list_category">
+                <ul class="category_list" id="category_list">
+                </ul>
             </div>
             <input type="hidden" id="category_select">
             <div class="category_add" id="category_add">
                 <button class="button_flat entypo-trash float_left" onclick=deleteCategory()>delete</button>
-                <button class="button_flat entypo-plus float_right" onclick=slideDrawer()>Add</button>
+                <button class="button_flat entypo-plus float_right" id="slide_category" onclick=openDrawer(this)>Add</button>
             </div>
-            <div class="category_add_drawer">
-                <input class="category_input" type="text" name="category" id="category_name" placeholder="Supplier Name">
+            <div class="category_add_drawer" id="add_category">
+                <input class="category_input" type="text" name="category" id="category_name" placeholder="Category Name">
                 <button name="add_button" class="button" onclick=addCategory()>Add</button>
-                <button class="button_cancel"  onclick=slideDrawer()>cancel</button>
+                <button class="button_cancel" onclick=closeDrawer(this)>close</button>
             </div>
         </div>
-
         <div class="list_container" id="list_container">
             <div class="div_item_list">
                 <h4 class="font_roboto">Categorized Items</h4>
@@ -101,20 +106,32 @@ if(isset($_POST["delete_id"])) {
 </body>
 </html>
 
-<script type="text/javascript" src="//code.jquery.com/jquery-2.2.0.min.js"></script>
+<script type="text/javascript" src="jq/jquery-3.2.1.min.js"></script>
+<script src="jq/jquery-ui.min.js"></script>
 <script src="https://cdn.rawgit.com/alertifyjs/alertify.js/v1.0.10/dist/js/alertify.js"></script>
-<script
-      src="https://code.jquery.com/ui/1.11.4/jquery-ui.min.js"
-      integrity="sha256-xNjb53/rY+WmG+4L6tTl9m6PpqknWZvRt0rO1SRnJzw="
-      crossorigin="anonymous"></script>
 <script src="touch_punch.js"></script>
 <script>
+    function supplierSelect(obj) {
+        var supplierId = $(obj).attr("id");
+        var date = $("#session_date").val() ;
+        document.getElementById("supplier_select").value = obj.children[0].innerHTML;
+
+        $.post("jq_ajax.php", {getCategories: "", supplierId: supplierId, date: date}, function(data,status){
+            $("#category_list").html(data);
+            $(".category_li:first").each(function() {
+                categorySelect($(this)[0]);
+                $(this).addClass("active");
+            });
+            $("#div").html("");
+        });
+    }
+
     function categorySelect(obj) {
-        var categoryName = obj.children[0].innerHTML;
+        var categoryId = $(obj).find("#cat_id").val();
         var date = $("#session_date").val() ;
         document.getElementById("category_select").value = obj.children[0].innerHTML;
 
-        $.post("jq_ajax.php", {getCategorizedItems: categoryName, date: date}, function(data,status){
+        $.post("jq_ajax.php", {getCategorizedItems: "", categoryId: categoryId, date: date}, function(data,status){
             document.getElementById("div").innerHTML = data;
             $("#categorized_list").sortable({
                 delay: 50,
@@ -135,9 +152,9 @@ if(isset($_POST["delete_id"])) {
                     ui.item.after(ui.item.data('multidrag')).remove();
                 },
                 receive: function(event, ui) {
-                    var categoryName = document.getElementById("category_select").value;
+                    var categoryId = $(obj).find("#cat_id").val();
                     $(this).children(".selected").each(function(){
-                        $.post("jq_ajax.php", {UpdateItemsCategory: "", itemName: $(this).attr("item-name"), categoryName: categoryName});
+                        $.post("jq_ajax.php", {UpdateItemsCategory: "", itemId: $(this).attr("id"), categoryId: categoryId});
                     });
                 },
                 update: function(event, ui) {
@@ -152,35 +169,140 @@ if(isset($_POST["delete_id"])) {
         });
     }
 
-    function slideDrawer() {
-        $(".category_add_drawer").slideToggle(180, "linear");
+    function openDrawer(obj) {
+        if ($(obj).attr("id") == "slide_supplier") {
+            $("#add_supplier").slideToggle(150, "swing");
+            $("#supplier_name").focus();
+        } else {
+            $("#add_category").slideToggle(150, "swing");
+            $("#category_name").focus();
+        }
     }
 
-    function deleteCategory() {
-        alertify.confirm("Delete Supplier '"+$(".active").children("span").html()+"' ?", function() {
-            $(".active").children("form").submit();
+    function closeDrawer(obj) {
+        $(obj).parent().slideToggle(150, "swing");
+    }
+
+    function addSupplier() {
+        supplierName = $("#supplier_name").val();
+        date = $("#session_date").val();
+        if (supplierName == "") {
+            return false;
+        }
+        $.post("jq_ajax.php", {addSupplier: "", supplierName: supplierName, date: date}, function(data, success) {
+            $("#supplier_name").val("");
+            if (data) {
+                alertify
+                    .delay(1000)
+                    .success("New Supplier Added");
+                updateSupplierOrder();
+                $.post("jq_ajax.php", {getSuppliers: "", date: date}, function(data) {
+                    $("#supplier_list").html(data);
+                });
+            } else {
+                alertify
+                    .delay(2500)
+                    .log('"'+supplierName+'" already exists');
+            }
         });
     }
 
     function addCategory() {
-        var ids = $(".list_category_li")
+        supplierId = $("#supplier_list .active").attr("id");
+        categoryName = $("#category_name").val();
+        date = $("#session_date").val();
+        if (categoryName == "") {
+            return false;
+        }
+        $.post("jq_ajax.php", {addCategory: "", categoryName: categoryName, supplierId: supplierId, date: date}, function(data) {
+            $("#category_name").val("");
+            if (data) {
+                alertify
+                    .delay(2000)
+                    .success("New Category Added");
+                updateCategoryOrder();
+                $.post("jq_ajax.php",  {getCategories: "", supplierId: supplierId, date: date}, function(data) {
+                    $("#category_list").html(data);
+                });
+            } else {
+                alertify
+                    .delay(2500)
+                    .log('"'+categoryName+'" already exists');
+            }
+        });
+    }
+
+    function updateSupplierOrder() {
+         var ids = $(".supplier_li")
+                    .map(function() {
+                        return this.id;
+                    }).get();
+        $.post("jq_ajax.php", {UpdateSupplierOrder: "", supplierIds: ids});
+    }
+
+    function updateCategoryOrder() {
+        var ids = $(".category_li")
                     .map(function() {
                         return this.id;
                     }).get();
         $.post("jq_ajax.php", {UpdateCategoryOrder: "", categoryIds: ids});
-        $("#new_name").val($("#category_name").val());
-        $("#add_form").submit();
     }
 
-    $(document).ready(function() {
+    function deleteSupplier() {
+        alertify.confirm("Delete Supplier '"+$("#supplier_list .active").children("span").html()+"' ?", function() {
+            var supplierId = $("#supplier_list .active").attr("id");
+            var date = $("#session_date").val();
+            var categoryIds = $(".category_li").map(function() {return this.id;}).get();
+            $.post("jq_ajax.php", {deleteSupplier: "", supplierId: supplierId, categoryIds: categoryIds}, function() {
+                $.post("jq_ajax.php", {getSuppliers: "", date: date}, function(data) {
+                    $("#supplier_list").html(data);
+                    $("#categorized_list").html("");
+                    $("#uncategorized_list").html("");
+                    $(".supplier_li:first").each(function() {
+                       supplierSelect($(this)[0]);
+                       $(this).addClass("active");
+                    });
+                });
+                $.post("jq_ajax.php", {getUncategorizedItems: ""}, function(data) {
+                    $("#uncategorized_list").html(data);
+                });
+            });
+        });
+    }
 
-        $(".list_category_li:first").each(function() {
-           categorySelect($(this)[0]);
+    function deleteCategory() {
+        alertify.confirm("Delete Category '"+$("#category_list .active").children("span").html()+"' ?", function() {
+            var supplierId = $("#supplier_list .active").attr("id");
+            var categoryId = $("#category_list .active").attr("id");
+            var date = $("#session_date").val();
+            $.post("jq_ajax.php", {deleteCategory: "", categoryId: categoryId}, function() {
+                $.post("jq_ajax.php",  {getCategories: "", supplierId: supplierId, date: date}, function(data) {
+                    $("#category_list").html(data);
+                    $("#categorized_list").html("");
+                    $(".category_li:first").each(function() {
+                       categorySelect($(this)[0]);
+                       $(this).addClass("active");
+                    });
+                });
+                $.post("jq_ajax.php", {getUncategorizedItems: ""}, function(data) {
+                    $("#uncategorized_list").html(data);
+                });
+            });
+        });
+    }
+    $(document).ready(function() {
+        $(".supplier_li:first").each(function() {
+           supplierSelect($(this)[0]);
            $(this).addClass("active");
         });
 
-        $(".list_category_li").click(function() {
-            $(".list_category_li").removeClass("active");
+        $(document).on("click", ".supplier_li", function() {
+            $(".supplier_li").removeClass("active");
+            $(this).addClass("active");
+        });
+
+        $(document).on("click", ".category_li", function() {
+            $(".category_li").removeClass("active");
             $(this).addClass("active");
         });
 
@@ -207,7 +329,7 @@ if(isset($_POST["delete_id"])) {
             },
             receive: function(event, ui) {
                 $(this).children(".selected").each(function() {
-                    $.post("jq_ajax.php", {UpdateItemsCategory: "", itemName: $(this).attr("item-name"), categoryName: null});
+                    $.post("jq_ajax.php", {UpdateItemsCategory: "", itemId: $(this).attr("id"), categoryId: ""});
                 });
             }
         });
@@ -222,8 +344,21 @@ if(isset($_POST["delete_id"])) {
                 ui.item.removeClass("category_drag");
             },
             update: function(event, ui) {
-                var ids = $(this).sortable("toArray");
-                $.post("jq_ajax.php", {UpdateCategoryOrder: "", categoryIds: ids});
+                updateCategoryOrder();
+            }
+        });
+
+        $("#supplier_list").sortable({
+            revert: 150,
+            containment: "#supplier_list",
+            start: function(event, ui) {
+                ui.item.addClass("category_drag");
+            },
+            stop: function (event, ui) {
+                ui.item.removeClass("category_drag");
+            },
+            update: function(event, ui) {
+                updateSupplierOrder();
             }
         });
 

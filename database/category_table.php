@@ -13,21 +13,21 @@ class CategoryTable extends DatabaseTable {
      * @return boolean               returns true on query success and false if category already exists.
      * @throws Exception             if query fails.
      */
-    public static function add_category($category_name, $date) {
+    public static function add_category($category_name, $supplier_id, $date) {
 
         $sql = "SELECT * FROM Category
-                WHERE name = '{$category_name}' AND deletion_date IS NULL";
+                WHERE name = '{$category_name}' AND supplier_id = $supplier_id AND deletion_date IS NULL";
         $result = parent::query($sql);
         if ($result->num_rows == 0) {
             $sql = "SELECT * FROM Category
-                    WHERE name = '{$category_name}' AND deletion_date = '{$date}'";
+                    WHERE name = '{$category_name}' AND supplier_id = $supplier_id AND deletion_date = '{$date}'";
             $result = parent::query($sql);
             if ($result->num_rows == 0) {
-                $sql = "INSERT INTO Category (name, creation_date)
-                        VALUES ('{$category_name}', '{$date}')";
+                $sql = "INSERT INTO Category (name, supplier_id, creation_date)
+                        VALUES ('{$category_name}', $supplier_id, '{$date}')";
             } else {
                 $sql = "UPDATE Category SET deletion_date = NULL
-                        WHERE name = '{$category_name}' and deletion_date = '{$date}'";
+                        WHERE name = '{$category_name}' AND supplier_id = $supplier_id AND deletion_date = '{$date}'";
             }
             if (parent::query($sql)) {
                 return true;
@@ -67,9 +67,10 @@ class CategoryTable extends DatabaseTable {
      * @param  string $date       date till which categories will be retrieved.
      * @return object|false       returns mysqli_result object if data is retrieved or false if query fails.
      */
-    public static function get_categories($date) {
+    public static function get_categories($supplier_id, $date) {
         $sql = "SELECT * FROM Category
-                WHERE creation_date <= '{$date}' AND (deletion_date > '{$date}' OR deletion_date IS NULL)
+                WHERE supplier_id = $supplier_id
+                AND creation_date <= '{$date}' AND (deletion_date > '{$date}' OR deletion_date IS NULL)
                 ORDER BY order_id ASC";
 
         return parent::query($sql);
@@ -96,16 +97,17 @@ class CategoryTable extends DatabaseTable {
      * @param  string $date     date till which data should be retrieved.
      * @return object|false     returns mysqli_result object if data is retrieved or false if query fails.
      */
-    public static function get_print_preview($date) {
-        $sql = "SELECT Category.name AS category_name, Item.name AS item_name, Item.id AS item_id,
-                    IFNULL(unit, '-') AS unit, IFNULL(quantity, '-') AS quantity, Inv.notes AS notes,
-                    Category.order_id AS Cat_order, Item.order_id AS Item_order
+    public static function get_print_preview($supplier_id, $date) {
+        $sql = "SELECT Category.name AS category_name, Category.id as cat_id, Item.name AS item_name,
+                       Item.id AS item_id, IFNULL(unit, '-') AS unit, IFNULL(quantity, '-') AS quantity,
+                       Inv.notes AS notes
                 FROM Category
                 INNER JOIN Item ON Item.category_id = Category.id
                 LEFT OUTER JOIN (SELECT * FROM Inventory WHERE date='{$date}') AS Inv ON Inv.item_id = Item.id
-                WHERE (Category.creation_date <= '{$date}' AND (Category.deletion_date > '{$date}' OR Category.deletion_date IS NULL))
+                WHERE supplier_id = $supplier_id
+                AND (Category.creation_date <= '{$date}' AND (Category.deletion_date > '{$date}' OR Category.deletion_date IS NULL))
                 AND (Item.creation_date <= '{$date}' AND (Item.deletion_date > '{$date}' OR Item.deletion_date IS NULL))
-                ORDER BY Cat_order, Item_order";
+                ORDER BY Category.order_id, Item.order_id";
 
         return parent::query($sql);
     }

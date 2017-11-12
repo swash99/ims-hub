@@ -124,8 +124,7 @@ $item_table = ItemTable::get_items_categories($_SESSION["date"]);
     </form>
  </body>
  </html>
-
-<script type="text/javascript" src="//code.jquery.com/jquery-2.2.0.min.js"></script>
+<script type="text/javascript" src="jq/jquery-3.2.1.min.js"></script>
 <script src="https://cdn.rawgit.com/alertifyjs/alertify.js/v1.0.10/dist/js/alertify.js"></script>
 <script>
     function  getItems() {
