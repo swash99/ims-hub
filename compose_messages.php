@@ -87,7 +87,6 @@ if (isset($_POST["message"])) {
                     <ul id="user_list">
                     <?php $result = UserTable::get_users(); ?>
                     <?php while ($row = $result->fetch_assoc()): ?>
-                        <?php if ($row["username"] != $_SESSION["username"]): ?>
                             <li class="contact_li" data-user="<?php echo $row['username'] ?>">
                                 <div id="username">
                                     <div>
@@ -99,7 +98,6 @@ if (isset($_POST["message"])) {
                                     </div>
                                 </div>
                             </li>
-                        <?php endif ?>
                     <?php endwhile ?>
                     </ul>
                     <ul class="display_none" id="group_list">

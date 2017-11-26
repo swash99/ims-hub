@@ -48,7 +48,7 @@ class ConversationTable extends DatabaseTable {
     public static function get_received_conversations($user) {
         $sql = "SELECT id, `timestamp`, sender, receiver, first_name, last_name, sender_status, receiver_status, title, mSender, mTable.message FROM Conversation
                 INNER JOIN (SELECT first_name, last_name, username FROM User) AS nameTable
-                ON (nameTable.username = sender OR nameTable.username = receiver) AND (nameTable.username != '$user')
+                ON ((sender != receiver) AND (nameTable.username = sender OR nameTable.username = receiver) AND (nameTable.username != '$user')) OR ((sender = receiver) AND  (nameTable.username = sender))
                 INNER JOIN (SELECT id AS sstId, status AS sender_status FROM ConversationStatus) AS senderStatusTable
                 ON senderStatusTable.sstId = sender_conversationStatusId
                 INNER JOIN (SELECT id AS rstId, `status` AS receiver_status FROM ConversationStatus) AS receiverStatusTable
