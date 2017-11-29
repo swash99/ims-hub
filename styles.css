@@ -387,7 +387,7 @@ input:-moz-read-only::-moz-placeholder{
     background: #f4f4f5;
 }
 .inventory_toolbar{
-    width: 100%;
+    display: flex;
     margin: 0;
     padding: 0;
     border: 1px solid #cecece;
@@ -513,7 +513,7 @@ input:-moz-read-only::-moz-placeholder{
 }
 #div_switch{
     float: left;
-    padding: 6px 0px;
+    padding: 7px 0px;
 }
 #div_pp{
     float: right;
@@ -1067,10 +1067,14 @@ input:-moz-read-only::-moz-placeholder{
 }
 .toolbar_print{
     display: flex;
+    align-items: center;
     padding: 0;
     border-bottom: 1px solid #cecece;
     background: #f4f4f5;
     font-family: "Open Sans";
+}
+#pp_toolbar .toolbar_div{
+    flex: 1;
 }
 .table_view{
     position: relative;
@@ -2102,7 +2106,6 @@ input:focus{
 }
 #invoice_toolbar{
     border: none;
-    display: initial;
     border-bottom: 1px solid #cecece;
 }
 #invoice_table{
@@ -2585,7 +2588,8 @@ input:focus{
     color: #444 !important;
 }
 .toolbar_conversation{
-    display: block;
+    display: flex;
+    align-items: center;
     position: absolute;
     top: 0;
     left: 0;
@@ -2595,13 +2599,13 @@ input:focus{
     background: white;
 }
 .toolbar_div {
-    display: inline-block;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     padding: 0px 5px;
     margin: 0;
     color: #555;
     font-size: 15px;
-    vertical-align: middle;
-    flex: 1;
     text-align: center;
 }
 
@@ -2615,21 +2619,33 @@ input:focus{
     color: #555;
 }
 #totalcost_div{
-    margin-right: 1vw;
+    flex: 1;
+    align-items: center;
+    justify-content: flex-end;
 }
 #totalcost_div #label{
+    display: inline-block;
     font-size: 14px;
     text-transform: uppercase;
-    padding: 10px 0px;
-    display: inline-block;
-    vertical-align: middle;
+    padding: 10px;
+    border-right: 1px solid #afafaf;
+    border-left: 1px solid #afafaf;
 }
-#totalcost_div #cost_span{
+#totalcost_div #cost_span, #totalcost_div #tax_cost{
+    background: white;
     display: inline-block;
     font-size: 20px;
     color: #111;
-    padding: 5px;
-    vertical-align: middle;
+    padding: 6px 10px;
+    min-width: 50px;
+}
+#totalcost_div #tax_span{
+    display: inline-block;
+    font-size: 11px;
+    text-transform: uppercase;
+    padding: 12px 5px;
+    border-right: 1px solid #afafaf;
+    border-left: 1px solid #afafaf;
 }
 #multi_delete_form{
     display: inline-block;
@@ -2638,6 +2654,8 @@ input:focus{
     vertical-align: middle;
     display: inline-block;
     width: 15px;
+    margin: 0px 5px;
+    padding: 10px 0px;
     text-align: right;
 }
 #button_div{
@@ -2663,6 +2681,7 @@ input:focus{
 }
 .option{
     display: inline-block;
+    flex: 1;
     position: relative;
     margin: 0px;
     padding: 10px 10px;

@@ -93,14 +93,14 @@ $readonly = $_SESSION["date"] <= date('Y-m-d', strtotime("-".$_SESSION["history_
                        <span class="switch-handle"></span>
                    </label>
                 </div>
-                <div class="toolbar_div">
+                <div class="toolbar_div flex_1">
                     <h4 id="name"></h4>
-                </div>
-                <div class="toolbar_div" id="div_pp">
-                    <a href="print_preview.php" class="fa-print pp_button">Print Preview</a>
                 </div>
                 <div class="toolbar_div search_div">
                     <input class="search_bar" id="search_bar" type="search" placeholder="search" oninput=searchBar(this)>
+                </div>
+                <div class="toolbar_div" id="div_pp">
+                    <a href="print_preview.php" class="fa-print pp_button">Print Preview</a>
                 </div>
             </div>
             <div class="inventory_table">

@@ -322,6 +322,7 @@ if (isset($_POST["getTrackedInvoice"])) {
                     $quantity_required = $quantity_required == "" ? "-" : $quantity_required;
                     $cost = is_numeric($row["cost_delivered"]) ? "$ ".$row["cost_delivered"] : "-";
                     $delivered_warning = "";
+                    $notes = $row["invoice_notes"] != "" ? $row["invoice_notes"] : $row["notes"];
 
                     if ($quantity_required == $row["quantity_delivered"]) {
                         $cell_class = "marked";
@@ -346,7 +347,7 @@ if (isset($_POST["getTrackedInvoice"])) {
                     <td class="'.$delivered_warning.'"><input  onchange="markCustom(this); updateQuantity(this);" type="number" id="quantity_delivered" value="'.$row["quantity_delivered"].'" '.$readonly.' '.($row["quantity_delivered"] != "" ? "readonly" : "").' ></td>
                     <td class="cost">'.$cost.'</td>
                     <td id="td_notes">
-                        <textarea name="" id="" rows="2" onchange="updateNotes(this)" value="'.$row["invoice_notes"].'" '.$readonly.' >'.$row["invoice_notes"].'</textarea>
+                        <textarea name="" id="" rows="2" onchange="updateNotes(this)" value="'.$notes.'" '.$readonly.' >'.$notes.'</textarea>
                     </td>
                     <input type="hidden" id="item_id" value="'.$row["item_id"].'">
                 </tr>';

@@ -33,7 +33,7 @@ $_SESSION["last_activity"] = time();
     <link rel="stylesheet" href="styles.css">
 </head>
 <body class="font_roboto">
-    <div class="toolbar_print">
+    <div class="toolbar_print" id="pp_toolbar">
         <div class="toolbar_div">
             <a href="category_status.php" class="option" id="back">back</a>
         </div>

@@ -82,5 +82,15 @@ class InvoiceTable extends DbRemoteTable {
 
         return parent::query($sql, $database);
     }
+
+    public static function get_sales_tax($database) {
+        $sql = "SELECT value FROM Variables WHERE name='SalesTax'";
+
+        if ($result = parent::query($sql, $database)) {
+            return (int) $result->fetch_assoc()['value'];
+        } else {
+            throw new Exception("get_sales_tax query failed");
+        }
+    }
 }
 ?>

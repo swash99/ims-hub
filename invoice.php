@@ -48,6 +48,7 @@ $_SESSION["last_activity"] = time();
                                 <?php if ($count > 0): ?>
                                     <span class="right counter"><?php echo $count ?></span>
                                 <?php endif ?>
+                                <input type="hidden" id="waterloo_sales_tax" value="<?php echo InvoiceTable::get_sales_tax("Waterloo"); ?>">
                             </a>
                         </li>
                         <li>
@@ -57,6 +58,7 @@ $_SESSION["last_activity"] = time();
                                 <?php if ($count > 0): ?>
                                     <span class="right counter"><?php echo $count ?></span>
                                 <?php endif ?>
+                                <input type="hidden" id="sauga_sales_tax" value="<?php echo InvoiceTable::get_sales_tax("Mississauga"); ?>">
                             </a>
                         </li>
                     </ul>
@@ -116,11 +118,13 @@ $_SESSION["last_activity"] = time();
 
         <div class="main_top_side">
             <div class="toolbar_print"  id="invoice_toolbar">
-                <label class="switch">
-                    <input class="switch-input" type="checkbox" onclick=checkRequired() />
-                    <span class="switch-label" data-on="Required" data-off="All"></span>
-                    <span class="switch-handle"></span>
-                </label>
+                <div class="toolbar_div">
+                    <label class="switch">
+                        <input class="switch-input" type="checkbox" onclick=checkRequired() />
+                        <span class="switch-label" data-on="Required" data-off="All"></span>
+                        <span class="switch-handle"></span>
+                    </label>
+                </div>
                 <div class="divider"></div>
                 <div class="toolbar_div">
                     <a id="print_share" class="option" onclick=sendPrint()>Share</a>
@@ -131,7 +135,9 @@ $_SESSION["last_activity"] = time();
                 </div>
                 <div class="toolbar_div float_right" id="totalcost_div">
                     <span id="label">total cost</span>
-                    <span id="cost_span"></span>
+                    <span id="cost_span">-</span>
+                    <span id="tax_span">w/tax</span>
+                    <span id="tax_cost">-</span>
                 </div>
             </div>
 
@@ -300,6 +306,7 @@ $_SESSION["last_activity"] = time();
             obj.parentNode.parentNode.children[5].innerHTML = "-";
             cost = "NULL";
             totalCost();
+            saveCost();
         }
         function saveCost() {
             $.post("jq_ajax.php", {updateCostDelivered: "", cost: cost, itemId: itemId, date: date, database});
@@ -421,12 +428,24 @@ $_SESSION["last_activity"] = time();
 
     function totalCost() {
         var totalCost = "";
+        var costSpan = document.getElementById("cost_span");
+        if ($("#heading").children().html() == "Waterloo") {
+            var tax = $("#waterloo_sales_tax").val();
+        } else {
+            var tax = $("#sauga_sales_tax").val();
+        }
         $(".cost").each(function() {
             var value = $(this).html() != "-" ? $(this).html() : "";
             totalCost = +totalCost + +value.replace('$ ', "");
         });
-        var costSpan = document.getElementById("cost_span");
         totalCost != "" ? costSpan.innerHTML = "$" + totalCost  : costSpan.innerHTML = "-";
+
+        if (tax > 0 && totalCost != "") {
+            var taxCost = (totalCost*tax/100) + totalCost;
+            $("#tax_cost").html("$" + taxCost);
+        } else {
+            $("#tax_cost").html("-");
+        }
     }
 
     $(document).ready(function() {
