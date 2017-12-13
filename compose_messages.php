@@ -40,27 +40,32 @@ if (isset($_POST["message"])) {
         $content = $mpdf->Output('', 'S');
         $mail->addStringAttachment($content, $_POST["attachment_title"].".pdf");
     }
+    $result = NotificationStatusTable::get_alert_info("notify by email", "received messages");
+    $recipient_address = 0;
     foreach ($_POST["recipient"] as $recipient) {
         ConversationTable::create_conversation($_SESSION["username"], $recipient, $_POST["title"],
             $_POST["message"], gmdate("Y-m-d H:i:s"),
             isset($_POST["attachment"]) ? $_POST["attachment"] : null,
             isset($_POST["attachment_title"]) ? $_POST["attachment_title"] : null, "read", "unread");
 
-        $result = NotificationStatusTable::get_alert_info("notify by email", "received messages");
         while ($row = $result->fetch_assoc()) {
             if ($row["noti_status"] == 1 AND $row["sub_noti_status"] == 1 AND $row["user_name"] == $recipient) {
-                $mail->Subject  = $_SESSION['first_name']." ".$_SESSION["last_name"]. " sent you a message: ".$_POST["title"];
-                $mail->addAddress($row["email"]);
-                if(!$mail->send()) {
-                  echo 'Message was not sent.';
-                  echo 'Mailer error: ' . $mail->ErrorInfo;
+                if ($recipient_address == 0) {
+                    $mail->AddAddress($row["email"], $row["first_name"].' '.$row["last_name"]);
+                    $recipient_address = 1;
                 } else {
-                  echo 'Message has been sent.';
+                    $mail->AddCC($row["email"], $row["first_name"].' '.$row["last_name"]);
                 }
-                $mail->clearAllRecipients();
             }
         }
+        mysqli_data_seek($result, 0);
+    }
 
+    if(!$mail->send()) {
+      echo 'Message was not sent.';
+      echo 'Mailer error: ' . $mail->ErrorInfo;
+    } else {
+      echo 'Message has been sent.';
     }
 }
 ?>
