@@ -4,6 +4,7 @@ require_once "database/user_table.php";
 require_once "database/conversation_table.php";
 require_once "database/user_group_table.php";
 require_once "database/user_group_list_table.php";
+require_once "database/contacts_table.php";
 require_once "database/notification_status_table.php";
 require_once "mpdf/vendor/autoload.php";
 include_once 'phpmailer/PHPMailerAutoload.php';
@@ -24,11 +25,17 @@ if (isset($_SESSION["last_activity"]) && $_SESSION["last_activity"] + $_SESSION[
 exit();
 }
 $_SESSION["last_activity"] = time();
+$contact_data = ContactsTable::get_contacts();
 
 if (isset($_POST["message"])) {
     $mail = new PHPMailer;
     $mail->setFrom('do-not-reply@auntyskitchen.ca', 'Auntys Kitchen - Kitchener');
     $mail->Body = "Title: ".$_POST["title"]."\n \n".$_POST["message"];
+    $mail->Subject = $_SESSION['first_name']." ".$_SESSION["last_name"]. " sent you a message: ".$_POST["title"];
+    $mail->isSMTP();
+    $mail->Port = 25;
+    $mail->SMTPAuth = false;
+    $mail->SMTPSecure = false;
 
     if (isset($_POST["attachment"])) {
         $mpdf = new mPDF("", "A4", 0, 'roboto', 0, 0, 0, 0, 0, 0);
@@ -42,6 +49,7 @@ if (isset($_POST["message"])) {
     }
     $result = NotificationStatusTable::get_alert_info("notify by email", "received messages");
     $recipient_address = 0;
+    $contact_address = 0;
     foreach ($_POST["recipient"] as $recipient) {
         ConversationTable::create_conversation($_SESSION["username"], $recipient, $_POST["title"],
             $_POST["message"], gmdate("Y-m-d H:i:s"),
@@ -59,6 +67,19 @@ if (isset($_POST["message"])) {
             }
         }
         mysqli_data_seek($result, 0);
+    }
+    foreach ($_POST["contacts"] as $contact) {
+        while ($row = $contact_data->fetch_assoc()) {
+            if ($row["name"] == $contact) {
+                if ($contact_address == 0) {
+                    $mail->AddAddress($row["email"], $row["name"]);
+                    $contact_address = 1;
+                } else {
+                    $mail->AddCC($row["email"], $row["name"]);
+                }
+            }
+        }
+        mysqli_data_seek($contact_data, 0);
     }
 
     if(!$mail->send()) {
@@ -86,7 +107,8 @@ if (isset($_POST["message"])) {
                 <div id="container"></div>
                 <div class="name_drawer">
                     <div class="toolbar_print">
-                        <div class="toolbar_div option selected">all users</div>
+                        <div class="toolbar_div option selected">users</div>
+                        <div class="toolbar_div option">contacts</div>
                         <div class="toolbar_div option">groups</div>
                     </div>
                     <ul id="user_list">
@@ -104,6 +126,22 @@ if (isset($_POST["message"])) {
                                 </div>
                             </li>
                     <?php endwhile ?>
+                    </ul>
+                    <ul class="display_none" id="contact_list">
+                        <?php while ($row = $contact_data -> fetch_assoc()): ?>
+                            <li class="contact_li" data-user="<?php echo $row['name'] ?>">
+                                <div id="username">
+                                    <div>
+                                        <span class="entypo-user avatar"></span>
+                                    </div>
+                                    <div>
+                                        <span id="name"><?php echo $row["name"]?></span>
+                                        <span id="user_name"><?php echo $row["email"]?></span>
+                                    </div>
+                                </div>
+                            </li>
+                        <?php endwhile ?>
+                        <?php mysqli_data_seek($contact_data, 0) ?>
                     </ul>
                     <ul class="display_none" id="group_list">
                         <?php $result = UserGroupTable::get_groups() ?>
@@ -157,16 +195,26 @@ if (isset($_POST["message"])) {
         $(".option").click(function() {
             $(".option").removeClass("selected");
             $(this).addClass("selected");
-            if ($(this).html() == "groups") {
-                $("#user_list").css("display", "none");
-                $("#group_list").css("display", "inline-block");
-            } else {
-                $("#group_list").css("display", "none");
-                $("#user_list").css("display", "inline-block");
+            switch ($(this).html()) {
+                case 'groups':
+                    $("#contact_list").css("display", "none");
+                    $("#user_list").css("display", "none");
+                    $("#group_list").css("display", "inline-block");
+                    break;
+                case "users":
+                    $("#group_list").css("display", "none");
+                    $("#contact_list").css("display", "none");
+                    $("#user_list").css("display", "inline-block");
+                    break;
+                case "contacts":
+                    $("#group_list").css("display", "none");
+                    $("#user_list").css("display", "none");
+                    $("#contact_list").css("display", "inline-block");
+                    break;
             }
         });
 
-        $(".contact_li").click(function() {
+        $("#user_list .contact_li").click(function() {
             var contact = $(this).html();
             $(this).toggleClass(function() {
                 if ($(this).hasClass("selected")) {
@@ -185,9 +233,28 @@ if (isset($_POST["message"])) {
             });
         });
 
+        $("#contact_list .contact_li").click(function() {
+            var contact = $(this).html();
+            $(this).toggleClass(function() {
+                if ($(this).hasClass("selected")) {
+                    $(".name_tag").each(function() {
+                        if ($(this).children("span").html() == contact) {
+                            $(this).remove();
+                        }
+                    });
+                } else {
+                    var span = "<div class='name_tag'><span>"+contact+"</span>"+
+                                   "<input type='hidden' name='contacts[]' value='"+$(this).attr("data-user")+"'>"+
+                               "</div>"
+                    $("#container").append(span);
+                }
+                return "selected";
+            });
+        });
+
         $(".group_li").click(function() {
             $(".name_tag").remove();
-            $(".contact_li").removeClass("selected");
+            $("#user_list .contact_li").removeClass("selected");
 
             if ($(this).hasClass("selected")) {
                 $(this).removeClass("selected");
@@ -196,7 +263,7 @@ if (isset($_POST["message"])) {
                 $(this).addClass("selected");
                 var users = JSON.parse($(this).find("#group_users").val());
                 for (var i = 0; i < users.length; i++) {
-                    $(".contact_li").each(function() {
+                    $("#user_list .contact_li").each(function() {
                         if ($(this).attr("data-user") == users[i].username) {
                             if (!$(this).hasClass("selected")) {
                                 $(this).addClass("selected");

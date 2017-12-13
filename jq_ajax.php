@@ -11,6 +11,7 @@ require_once "database/conversation_table.php";
 require_once "database/notification_status_table.php";
 require_once "database/sub_notification_status_table.php";
 require_once "database/user_group_list_table.php";
+require_once "database/contacts_table.php";
 
 $readonly = $_SESSION["date"] <= date('Y-m-d', strtotime("-".$_SESSION["history_limit"])) ? "readonly" : "";
 
@@ -467,4 +468,9 @@ if (isset($_POST["setSubNotiStatus"])) {
 if (isset($_POST["setUserEmail"])) {
     echo UserTable::update_user_email($_POST["userName"], $_POST["email"]);
 }
+
+if (isset($_POST["updateContactDetails"])) {
+    echo ContactsTable::update_contact_details($_POST["id"], $_POST["name"], $_POST["email"]);
+}
+
 ?>

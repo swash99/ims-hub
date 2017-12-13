@@ -75,6 +75,12 @@ if(isset($_POST["new_date"])) {
                             </a>
                         </li>
                         <li>
+                            <a href="contacts.php" target="task_frame">
+                                <span class="image fa-id-card-o"></span>
+                                <span class="text">Contacts</span>
+                            </a>
+                        </li>
+                        <li>
                             <a href="admin_settings.php" target="task_frame">
                                 <span class="image fa-cog"></span>
                                 <span class="text">Settings</span>
@@ -89,20 +95,17 @@ if(isset($_POST["new_date"])) {
             <iframe class="iframe" src="edit_categories.php" frameborder="0" name="task_frame" id="task_frame"></iframe>
         </div>
     </div>
-    <?php $page = "admin tasks";
-    include_once "new_nav.php" ?>
 
     <form action="admin_tasks.php" method="post" id="cal_form">
         <input type="hidden" id="cal_date" name="new_date" value="<?php echo $_SESSION["date"] ?>">
     </form>
+
+<script type="text/javascript" src="jq/jquery-3.2.1.min.js"></script>
+    <?php $page = "admin tasks";
+    include_once "new_nav.php" ?>
 </body>
 </html>
-
-<script type="text/javascript" src="//code.jquery.com/jquery-2.2.0.min.js"></script>
-<script
-      src="http://code.jquery.com/ui/1.12.1/jquery-ui.min.js"
-      integrity="sha256-VazP97ZCwtekAsvgPBSUwPFKdrwD3unUfSGVYrahUqU="
-      crossorigin="anonymous"></script>
+<script src="jq/jquery-ui.min.js"></script>
 <script>
     $(document).ready(function() {
 

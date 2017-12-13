@@ -3,7 +3,7 @@
 -- http://www.phpmyadmin.net
 --
 -- Host: 127.0.0.1
--- Generation Time: Nov 12, 2017 at 03:05 PM
+-- Generation Time: Dec 13, 2017 at 08:10 AM
 -- Server version: 5.6.17
 -- PHP Version: 5.5.12
 
@@ -40,6 +40,19 @@ CREATE TABLE IF NOT EXISTS `Category` (
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `Contacts`
+--
+
+CREATE TABLE IF NOT EXISTS `Contacts` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `name` varchar(45) NOT NULL,
+  `email` varchar(45) NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=4 ;
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `Conversation`
 --
 
@@ -59,7 +72,7 @@ CREATE TABLE IF NOT EXISTS `Conversation` (
   KEY `FK_receiver_idx` (`receiver`),
   KEY `FK_senderConversationId_idx` (`sender_conversationStatusId`),
   KEY `FK_receiverConversationId_idx` (`receiver_conversationStatusId`)
-) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=10 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=11 ;
 
 -- --------------------------------------------------------
 
@@ -122,7 +135,7 @@ CREATE TABLE IF NOT EXISTS `Message` (
   `attachment_title` varchar(45) DEFAULT NULL,
   `conversation_id` int(11) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=10 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=13 ;
 
 -- --------------------------------------------------------
 
