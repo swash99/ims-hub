@@ -35,7 +35,10 @@ $_SESSION["last_activity"] = time();
 <body>
     <div class="category_main font_open_sans">
         <div class="div_category">
-            <h4 class="font_roboto">Suppliers</h4>
+            <div class="div_list_title">
+                <h4 class="font_roboto">Suppliers</h4>
+                <span class="list_sort fa-sort-alpha-asc" id="supplier_sort"></span>
+            </div>
             <div class="div_list_category">
                 <ul class="category_list" id="supplier_list">
                     <?php $result = SupplierTable::get_suppliers($_SESSION["date"]) ?>
@@ -62,7 +65,10 @@ $_SESSION["last_activity"] = time();
             </div>
         </div>
         <div class="div_category">
-            <h4 class="font_roboto">Categories</h4>
+            <div class="div_list_title">
+                <h4 class="font_roboto">Categories</h4>
+                <span class="list_sort fa-sort-alpha-asc" id="cat_sort"></span>
+            </div>
             <div class="div_list_category">
                 <ul class="category_list" id="category_list">
                 </ul>
@@ -80,7 +86,10 @@ $_SESSION["last_activity"] = time();
         </div>
         <div class="list_container" id="list_container">
             <div class="div_item_list">
-                <h4 class="font_roboto">Categorized Items</h4>
+                <div class="div_list_title">
+                    <h4 class="font_roboto">Categorized Items</h4>
+                    <span class="list_sort fa-sort-alpha-asc" id="cat_item_sort"></span>
+                </div>
                 <div id="div" class="div_list">
                     <ul class="category_list" name="" id="categorized_list" ></ul>
                 </div>
@@ -365,6 +374,52 @@ $_SESSION["last_activity"] = time();
         $("#uncategorized_list").on('click', 'li', function() {
             $(this).toggleClass("selected");
             $("#categorized_list li").removeClass("selected");
+        });
+
+        $("#supplier_sort").click(function() {
+            alertify.confirm("Sort Suppliers alphabetically?", function() {
+                $(".supplier_li").each(function() {
+                    var item = $(this);
+                    $(".supplier_li").each(function() {
+                        if (item.find("span").html().toLowerCase() > $(this).find("span").html().toLowerCase()) {
+                            $(this).insertBefore(item);
+                        }
+                    });
+                });
+                updateSupplierOrder();
+            });
+        });
+
+        $("#cat_sort").click(function() {
+            alertify.confirm("Sort Categories alphabetically?", function() {
+                $(".category_li").each(function() {
+                    var item = $(this);
+                    $(".category_li").each(function() {
+                        if (item.find("span").html().toLowerCase() > $(this).find("span").html().toLowerCase()) {
+                            $(this).insertBefore(item);
+                        }
+                    });
+                });
+                updateCategoryOrder();
+            });
+        });
+
+        $("#cat_item_sort").click(function() {
+            alertify.confirm("Sort Items alphabetically?", function() {
+                $("#categorized_list").find(".list_li").each(function() {
+                    var item = $(this);
+                    $("#categorized_list").find(".list_li").each(function() {
+                        if (item.html().toLowerCase() > $(this).html().toLowerCase()) {
+                            $(this).insertBefore(item);
+                        }
+                    });
+                });
+                var ids = $("#categorized_list").find(".list_li")
+                    .map(function() {
+                        return this.id;
+                    }).get();
+                $.post("jq_ajax.php", {UpdateItemOrder: "", itemIds: ids});
+            });
         });
     });
 </script>
