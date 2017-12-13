@@ -68,16 +68,25 @@ $_SESSION["last_activity"] = time();
                         <div class="heading" ><h4>Invoices</h4></div>
                         <ul class="side_nav invoice_list" id="Waterloo_list">
                         <?php $result = InvoiceTable::get_tracked_invoices("Waterloo");
+                            $old_month = null;
+                            $old_year = null;
                             while ($row = $result->fetch_assoc()) :
                             $date = date_add(date_create($row["date"]), date_interval_create_from_date_string("1 day")); ?>
+                            <?php if ($old_year != date_format($date, "Y")):
+                                    $old_year = date_format($date, "Y");?>
+                                    <li class="list_heading invoice_year"><span><?php echo date_format($date, "Y") ?></span></li>
+                            <?php endif ?>
+                            <?php if ($old_month != date_format($date, "F")):
+                                    $old_month = date_format($date, "F");?>
+                                    <li class="list_heading invoice_month"><span><?php echo date_format($date, "F") ?></span></li>
+                            <?php endif ?>
                             <li>
                                 <a class="invoice_date" onclick="showInvoice(this)">
                                     <div id="left">
                                         <span><?php echo date_format($date, "jS"); ?></span>
                                     </div>
                                     <div id="right">
-                                        <span id="top"><?php echo date_format($date, "F"); ?></span>
-                                        <span id="bottom"><?php echo date_format($date, "D Y"); ?></span>
+                                        <span><?php echo date_format($date, "l"); ?></span>
                                     </div>
                                     <input type="hidden" id="selected_date" value="<?php echo date_format($date, "D, jS M Y") ?>">
                                     <input type="hidden" id="created_date" value="<?php echo date_format(date_create($row["date"]), "jS M Y") ?>">
@@ -90,16 +99,25 @@ $_SESSION["last_activity"] = time();
                         </ul>
                         <ul class="side_nav invoice_list" id="Mississauga_list">
                             <?php $result = InvoiceTable::get_tracked_invoices("Mississauga");
+                            $old_month = null;
+                            $old_year = null;
                             while ($row = $result->fetch_assoc()) :
                             $date = date_add(date_create($row["date"]), date_interval_create_from_date_string("1 day")); ?>
+                            <?php if ($old_year != date_format($date, "Y")):
+                                    $old_year = date_format($date, "Y");?>
+                                    <li class="list_heading invoice_year"><span><?php echo date_format($date, "Y") ?></span></li>
+                            <?php endif ?>
+                            <?php if ($old_month != date_format($date, "F")):
+                                    $old_month = date_format($date, "F");?>
+                                    <li class="list_heading invoice_month"><span><?php echo date_format($date, "F") ?></span></li>
+                            <?php endif ?>
                             <li>
                                 <a class="invoice_date" onclick="showInvoice(this)">
                                     <div id="left">
                                         <span><?php echo date_format($date, "jS"); ?></span>
                                     </div>
                                     <div id="right">
-                                        <span id="top"><?php echo date_format($date, "F"); ?></span>
-                                        <span id="bottom"><?php echo date_format($date, "D Y"); ?></span>
+                                        <span><?php echo date_format($date, "l"); ?></span>
                                     </div>
                                     <input type="hidden" id="selected_date" value="<?php echo date_format($date, "D, jS M Y") ?>">
                                     <input type="hidden" id="created_date" value="<?php echo date_format(date_create($row["date"]), "jS M Y") ?>">
@@ -448,6 +466,79 @@ $_SESSION["last_activity"] = time();
         }
     }
 
+    function updateMonthHeader() {
+        $(".invoice_month:not(.floating_header)").each(function() {
+            var el = $(this);
+            var position = el.position();
+            var floatingHeaderTop = null;
+            if ($(this).next().hasClass("floating_header")) {
+                var floatingHeader = $(this).next();
+            } else {
+                var floatingHeader = $(this).before($(this).clone())
+                                         .css("width", $(this).width())
+                                         .addClass("floating_header");
+            }
+            if (position.top < 70) {
+                el.css("visibility", "hidden");
+                floatingHeader.css("top", 70);
+                floatingHeader.css("visibility", "visible");
+                floatingHeaderTop = floatingHeader;
+            } else {
+                floatingHeader.css("visibility", "hidden");
+                el.css("visibility", "visible");
+            }
+            if (floatingHeaderTop) {
+                if (floatingHeaderTop.nextAll(".invoice_month:first").length > 0) {
+                    var nextTopPos = floatingHeaderTop.nextAll(".invoice_month:first").position().top;
+                    if (nextTopPos <= 98) {
+                        var prevTopPos = nextTopPos - (floatingHeader.height() + 10);
+                        floatingHeaderTop.css("top", prevTopPos);
+                    } else {
+                        floatingHeaderTop.css("top", 70);
+                    }
+                }
+            }
+        });
+    }
+
+    function updateYearHeader() {
+        $(".invoice_year:not(.floating_header)").each(function() {
+            var el = $(this);
+            var position = el.position();
+            var floatingHeaderTop = null;
+            if ($(this).next().hasClass("floating_header")) {
+                var floatingHeader = $(this).next();
+            } else {
+                var floatingHeader = $(this).before($(this).clone())
+                                         .css("width", $(this).width())
+                                         .addClass("floating_header");
+            }
+             if (position.top < 41) {
+                el.css("visibility", "hidden");
+                floatingHeader.css({"visibility": "visible", "top": 41});
+                floatingHeaderTop = floatingHeader;
+            }
+            if (position.top > 41 && position.top < 104) {
+                el.css("visibility", "hidden");
+                floatingHeader.css({"visibility": "visible", "top": position.top});
+            } else if (position.top > 104){
+                floatingHeader.css("visibility", "hidden");
+                el.css("visibility", "visible");
+            }
+            if (floatingHeaderTop) {
+                if (floatingHeaderTop.nextAll(".invoice_year:first").length > 0) {
+                    var nextTopPos = floatingHeaderTop.nextAll(".invoice_year:first").position().top;
+                    if (nextTopPos <= 66 && nextTopPos > 39) {
+                        var prevTopPos = nextTopPos - (floatingHeader.height() + 8);
+                        floatingHeaderTop.css("top", prevTopPos);
+                    } else {
+                        floatingHeaderTop.css("top", 41);
+                    }
+                }
+            }
+        });
+    }
+
     $(document).ready(function() {
 
         $(document).on("click", ".invoice_list li a" ,function() {
@@ -494,6 +585,11 @@ $_SESSION["last_activity"] = time();
         $("#popup_close").click(function() {
             $(".div_popup_back").fadeOut(190, "linear");
             $(".main_iframe").removeClass("blur");
+        });
+
+        $(".invoice_list").on("scroll", function(){
+            updateMonthHeader();
+            updateYearHeader();
         });
 
      });

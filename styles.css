@@ -976,6 +976,18 @@ input:-moz-read-only::-moz-placeholder{
     font-size: 10px;
     text-transform: uppercase;
 }
+.div_list_title{
+    position: relative;
+}
+.div_list_title .list_sort{
+    position: absolute;
+    right: 20px;
+    top: 10px;
+    cursor: pointer;
+}
+.div_list_title .list_sort:before{
+    font-size: 18px;
+}
 .div_category h4{
     padding: 10px 0px;
     font-size: 15px;
@@ -2124,20 +2136,24 @@ input:focus{
     padding: 12px 15px!important;
 }
 .invoice_date div{
+    padding: 0px 5px;
+    align-items: center;
+}
+.invoice_date #right{
+    flex: 2;
+    text-align: left;
+}
+.invoice_date #left{
     flex: 1;
+    text-align: right;
 }
 .invoice_date #left span{
-    font-size: 24px;
+    font-size: 17px;
 }
-.invoice_date #right #top{
-    display: block;
-    font-size: 16px;
-}
-.invoice_date #right #bottom{
-    display: block;
-    font-size: 12px;
+.invoice_date #right span{
+    font-size: 15px;
     text-transform: uppercase;
-    font-family: "Open Sans";
+    font-family: "Roboto";
 }
 .div_expected{
     display: flex;
@@ -2243,6 +2259,31 @@ input:focus{
     padding-bottom: 10px;
     overflow: auto;
     list-style-type: none;
+}
+.side_nav .list_heading{
+    background: #cecece;
+}
+.side_nav .floating_header{
+    position: absolute;
+}
+.side_nav .invoice_year{
+    background: #eaeaea;
+    padding: 5px 0px;
+    border-top: 1px solid #cecece;
+    text-align: center;
+    text-transform: uppercase;
+    font-size: 15px;
+    z-index: 3;
+}
+.side_nav .invoice_month{
+    background: #f4f4f5;
+    padding: 5px 0px;
+    border-top: 1px solid #cecece;
+    border-bottom: 1px solid #cecece;
+    text-align: center;
+    text-transform: uppercase;
+    font-size: 15px;
+    z-index: 2;
 }
 .side_nav .heading{
     margin-top: -1px;
@@ -3225,6 +3266,8 @@ li#heading h4{
 .sidenav .heading{
     text-align: center;
     padding: 9px 0px;
+    background: white;
+    z-index: 4;
     border-bottom: 1px solid #cecece;
 }
 .sidenav .div_list_con{
