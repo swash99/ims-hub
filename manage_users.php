@@ -86,7 +86,7 @@ if(isset($_POST["delete_username"])){
                 <th>Username</th>
                 <th>Role</th>
                 <th>Session timeout</th>
-                <th></th>
+                <th id="th_delete">Delete</th>
             </tr>
             <?php $result = UserTable::get_users(); ?>
             <?php while ($userdata = $result->fetch_assoc()): ?>
@@ -104,9 +104,9 @@ if(isset($_POST["delete_username"])){
                     <td id="timeout"> <?php echo $userdata["time_out"]; ?>
                     </td>
                     <td id="delete">
-                        <form action="manage_users.php" method="post" onsubmit=deleteUser(this)>
+                        <form action="manage_users.php" method="post" onclick=deleteUser(this)>
                             <input type="hidden" id="delete_username" name="delete_username" value="<?php echo $userdata["username"] ?>">
-                            <input type="image" src="images/delete.png" alt="delete" width="28px" height="28px" <?php if ($userdata["username"] == $_SESSION["username"]) { echo "style='display: none;'";} ?>>
+                            <span class="entypo-trash" <?php if ($userdata["username"] == $_SESSION["username"]) { echo "style='display: none;'";} ?>></span>
                         </form>
                     </td>
                 </tr>
@@ -129,7 +129,6 @@ if(isset($_POST["delete_username"])){
     }
 
     function deleteUser(obj) {
-        this.event.preventDefault();
         var name = obj.children[0].value;
         alertify.confirm("Delete '"+name+"' ?", function () {
             obj.submit();

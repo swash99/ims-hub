@@ -24,14 +24,17 @@ exit();
 }
 $_SESSION["last_activity"] = time();
 
-if (isset($_POST["add_button"]) AND !empty($_POST["group_name"])) {
+if (isset($_POST["new_name"]) AND !empty($_POST["new_name"])) {
     try {
-        if (!UserGroupTable::add_group($_POST["group_name"])) {
+        if (!UserGroupTable::add_group($_POST["new_name"])) {
             echo '<div class="error">Recipe already exists</div>';
         }
     } catch (Exception $e) {
         echo '<div class="error">'.$e->getMessage().'</div>';
     }
+}
+if (isset($_POST["edit_name"]) AND !empty($_POST["edit_name"])) {
+    UserGroupTable::update_group($_POST["edit_name"], $_POST["edit_id"]);
 }
 if(isset($_POST["delete_group"])) {
     UserGroupTable::remove_group($_POST["delete_group"]);
@@ -63,16 +66,23 @@ if(isset($_POST["delete_group"])) {
                 </ul>
             </div>
             <input type="hidden" id="category_select">
-            <div class="category_add" id="category_add">
-                <button class="button_flat entypo-trash float_left" onclick=deleteGroup()>delete</button>
-                <button class="button_flat entypo-plus float_right" onclick=slideDrawer()>Add</button>
+            <div class="option_bar" id="category_add">
+                <div class="toolbar_div option" onclick=deleteGroup()>
+                    <span class="icon_small entypo-trash"></span>
+                    <span class="icon_small_text">delete</span>
+                </div>
+                <div class="toolbar_div option" onclick='slideDrawer("add")'>
+                    <button class="button_round entypo-plus"></button>
+                </div>
+                <div class="toolbar_div option" onclick='slideDrawer("edit")' >
+                    <span class="icon_small fa-edit"></span>
+                    <span class="icon_small_text">edit</span>
+                </div>
             </div>
             <div class="category_add_drawer">
-                <form action="user_groups.php" method="post" >
-                    <input class="category_input" type="text" name="group_name" id="category_name" placeholder="Group Name">
-                    <input type="submit" name="add_button" value="Add" class="button">
-                </form>
-                <button class="button_cancel" onclick=slideDrawer()>cancel</button>
+                <input class="category_input" type="text" name="group_name" id="category_name" placeholder="Group Name">
+                <button name="add_button" id="add_button" class="button" onclick=checkButton(this)>Add</button>
+                <button class="button_cancel"  onclick=slideDrawer("")>cancel</button>
             </div>
         </div>
 
@@ -96,11 +106,24 @@ if(isset($_POST["delete_group"])) {
             </div>
         </div>
     </div>
+
+    <form action="user_groups.php" method="post" id="add_form">
+        <input type="hidden" name="new_name" id="new_name">
+    </form>
+    <form action="user_groups.php" method="post" id="edit_form">
+        <input type="hidden" name="edit_name" id="edit_name">
+        <input type="hidden" name="edit_id" id="edit_id">
+    </form>
 </body>
 </html>
 
 <script type="text/javascript" src="//code.jquery.com/jquery-2.2.0.min.js"></script>
 <script src="https://cdn.rawgit.com/alertifyjs/alertify.js/v1.0.10/dist/js/alertify.js"></script>
+<script
+      src="https://code.jquery.com/ui/1.11.4/jquery-ui.min.js"
+      integrity="sha256-xNjb53/rY+WmG+4L6tTl9m6PpqknWZvRt0rO1SRnJzw="
+      crossorigin="anonymous"></script>
+<script src="touch_punch.js"></script>
 <script>
 
     function groupSelect(obj) {
@@ -134,14 +157,44 @@ if(isset($_POST["delete_group"])) {
         $.post("jq_ajax.php", {deleteGroupUser: "", userId: userId, groupId: groupId});
     }
 
-    function slideDrawer() {
-        $(".category_add_drawer").slideToggle(180, "linear");
+    function slideDrawer(type) {
+        $(".category_add_drawer").slideToggle(120);
+        switch (type) {
+            case 'add':
+                $("#category_name").val("").focus();
+                $("#add_button").html("Add");
+                break;
+            case 'edit':
+                $("#category_name").val($(".active").children("span").html()).focus();
+                $("#add_button").html("Save");
+        }
+    }
+
+    function addGroup() {
+        $("#new_name").val($("#category_name").val());
+        $("#add_form").submit();
+    }
+
+    function editGroup() {
+        $("#edit_name").val($("#category_name").val());
+        $("#edit_id").val($(".active").attr("id"));
+        $("#edit_form").submit();
     }
 
     function deleteGroup() {
         alertify.confirm("Delete Group '"+$(".active").children("span").html()+"' ?", function() {
             $(".active").children("form").submit();
         });
+    }
+
+    function checkButton(obj) {
+        switch ($(obj).html()) {
+            case 'Add':
+                addGroup();
+                break;
+            case 'Save':
+                editGroup();
+        }
     }
 
     $(document).ready(function() {

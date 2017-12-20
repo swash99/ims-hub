@@ -716,7 +716,7 @@ input:-moz-read-only::-moz-placeholder{
     width: 50px;
     height: 50px;
     position: absolute;
-    top: -8px;
+    bottom: -25%;
     left: 0;
     right: 0;
     margin: auto;
@@ -1053,6 +1053,22 @@ input:-moz-read-only::-moz-placeholder{
     font-family: "Open Sans";
     color: #555;
 }
+.user_table input{
+    background: transparent;
+    border: 1px solid transparent;
+    border-bottom: 1px solid #bfbfbf;
+    margin: 0;
+    padding: 5px 0px;
+    text-align: center;
+    font-size: 15px;
+    font-family: "Open Sans";
+}
+.user_table #th_edit, .user_table #th_delete{
+    width: 80px;
+}
+.user_table #edit .selected{
+    color: #79b64d;
+}
 .user_table td#name{
     text-align: center;
 }
@@ -1077,13 +1093,18 @@ input:-moz-read-only::-moz-placeholder{
 .user_table td#delete input{
     outline: none;
 }
-.toolbar_print{
+.toolbar_print, .option_bar{
     display: flex;
     align-items: center;
     padding: 0;
-    border-bottom: 1px solid #cecece;
     background: #f4f4f5;
     font-family: "Open Sans";
+}
+.toolbar_print{
+    border-bottom: 1px solid #cecece;
+}
+.option_bar{
+    border-top: 1px solid #cecece;
 }
 #pp_toolbar .toolbar_div{
     flex: 1;
@@ -1428,7 +1449,7 @@ td.table_heading{
     border-bottom: 1px solid #cecece;
     font-size: 18px;
 }
-.table_view .option_bar{
+.table_view .table_option_bar{
     position: relative;
     border-bottom: 1px solid #cecece;
 }
@@ -2855,9 +2876,10 @@ input:focus{
 }
 .name_tag{
     display: inline-block;
+    flex: 0 0;
+    flex-basis: 150px;
     padding: 2px;
     margin: 2px;
-    min-width: 150px;
     background: #f4f4f5;
     border: 1px solid #cecece;
     font-size: 14px;
@@ -2873,7 +2895,8 @@ input:focus{
 .name_tag #name{
     text-transform: uppercase;
     font-size: 12px;
-    font-weight: 600
+    font-weight: 600;
+    white-space: nowrap;
 }
 .name_tag #user_name{
     font-size: 12px!important;
@@ -3133,7 +3156,8 @@ input:focus{
     color: white;
 }
 #username{
-    padding: 0px 10px;
+    display: flex;
+    padding: 0px 5px;
     margin: 0;
 }
 #username div{

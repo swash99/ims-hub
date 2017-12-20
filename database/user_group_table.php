@@ -12,6 +12,14 @@ class UserGroupTable extends DatabaseTable {
         return parent::query($sql);
     }
 
+    public static function update_group($name, $id) {
+        $sql = "UPDATE UserGroups
+                SET name = '$name'
+                WHERE id = $id";
+
+        return parent::query($sql);
+    }
+
     public static function remove_group($group_name) {
         $sql = "DELETE FROM UserGroups
                 WHERE name = '$group_name'";

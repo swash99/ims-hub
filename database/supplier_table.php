@@ -79,6 +79,14 @@ class SupplierTable extends DatabaseTable {
         return parent::query($sql);
     }
 
+    public static function update_supplier($name, $id) {
+        $sql = "UPDATE Suppliers
+                SET name = '$name'
+                WHERE id = $id";
+
+        return parent::query($sql);
+    }
+
     /**
      * Update order_id for the given supplier.
      *

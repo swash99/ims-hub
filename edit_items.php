@@ -60,7 +60,7 @@ $item_table = ItemTable::get_items_categories($_SESSION["date"]);
         <div class="div_table font_roboto" id="items_div_table">
             <div id="div_print_table">
                 <table class="table_view" id="item_table_view" border="1px" >
-                    <tr class="option_bar">
+                    <tr class="table_option_bar">
                         <th colspan="2" id="button_th">
                             <button class="button_flat entypo-plus" id="add_item_button">Add</button>
                             <div class="divider"></div>

@@ -23,6 +23,13 @@ if (isset($_SESSION["last_activity"]) && $_SESSION["last_activity"] + $_SESSION[
 exit();
 }
 $_SESSION["last_activity"] = time();
+
+if (isset($_POST["edit_s_name"]) AND !empty($_POST["edit_s_name"])) {
+    SupplierTable::update_supplier($_POST["edit_s_name"], $_POST["edit_s_id"]);
+}
+if (isset($_POST["edit_c_name"]) AND !empty($_POST["edit_c_name"])) {
+    CategoryTable::update_category($_POST["edit_c_name"], $_POST["edit_c_id"]);
+}
 ?>
 
 <!DOCTYPE html>
@@ -53,14 +60,23 @@ $_SESSION["last_activity"] = time();
                 </ul>
             </div>
             <input type="hidden" id="supplier_select">
-            <input type="hiddden" id="delete_cat_ids">
-            <div class="category_add" id="category_add">
-                <button class="button_flat entypo-trash float_left" onclick=deleteSupplier()>delete</button>
-                <button class="button_flat entypo-plus float_right" id="slide_supplier" onclick=openDrawer(this)>Add</button>
+            <input type="hidden" id="delete_cat_ids">
+            <div class="option_bar" id="category_add">
+                <div class="toolbar_div option" onclick=deleteSupplier()>
+                    <span class="icon_small entypo-trash"></span>
+                    <span class="icon_small_text">delete</span>
+                </div>
+                <div class="toolbar_div option" onclick='supplierDrawer("add")'>
+                    <button class="button_round entypo-plus"></button>
+                </div>
+                <div class="toolbar_div option" onclick='supplierDrawer("edit")' >
+                    <span class="icon_small fa-edit"></span>
+                    <span class="icon_small_text">edit</span>
+                </div>
             </div>
             <div class="category_add_drawer" id="add_supplier">
                 <input class="category_input" type="text" name="category" id="supplier_name" placeholder="Supplier Name">
-                <button name="add_button" class="button" onclick=addSupplier()>Add</button>
+                <button id="supplier_add_button" class="button" onclick=addSupplierButton(this)>Add</button>
                 <button class="button_cancel" onclick=closeDrawer(this)>close</button>
             </div>
         </div>
@@ -74,13 +90,22 @@ $_SESSION["last_activity"] = time();
                 </ul>
             </div>
             <input type="hidden" id="category_select">
-            <div class="category_add" id="category_add">
-                <button class="button_flat entypo-trash float_left" onclick=deleteCategory()>delete</button>
-                <button class="button_flat entypo-plus float_right" id="slide_category" onclick=openDrawer(this)>Add</button>
+             <div class="option_bar" id="category_add">
+                <div class="toolbar_div option" onclick=deleteCategory()>
+                    <span class="icon_small entypo-trash"></span>
+                    <span class="icon_small_text">delete</span>
+                </div>
+                <div class="toolbar_div option" onclick='categoryDrawer("add")'>
+                    <button class="button_round entypo-plus"></button>
+                </div>
+                <div class="toolbar_div option" onclick='categoryDrawer("edit")' >
+                    <span class="icon_small fa-edit"></span>
+                    <span class="icon_small_text">edit</span>
+                </div>
             </div>
             <div class="category_add_drawer" id="add_category">
                 <input class="category_input" type="text" name="category" id="category_name" placeholder="Category Name">
-                <button name="add_button" class="button" onclick=addCategory()>Add</button>
+                <button id="category_add_button" class="button" onclick=addCategoryButton(this)>Add</button>
                 <button class="button_cancel" onclick=closeDrawer(this)>close</button>
             </div>
         </div>
@@ -110,6 +135,14 @@ $_SESSION["last_activity"] = time();
 
     <form action="edit_categories.php" method="post" id="add_form">
         <input type="hidden" name="new_name" id="new_name">
+    </form>
+    <form action="edit_categories.php" method="post" id="supplier_form">
+        <input type="hidden" name="edit_s_name" id="edit_s_name">
+        <input type="hidden" name="edit_s_id" id="edit_s_id">
+    </form>
+    <form action="edit_categories.php" method="post" id="category_form">
+        <input type="hidden" name="edit_c_name" id="edit_c_name">
+        <input type="hidden" name="edit_c_id" id="edit_c_id">
     </form>
     <input type="hidden" id="session_date" value="<?php echo $_SESSION["date"] ?>">
 </body>
@@ -178,18 +211,54 @@ $_SESSION["last_activity"] = time();
         });
     }
 
-    function openDrawer(obj) {
-        if ($(obj).attr("id") == "slide_supplier") {
-            $("#add_supplier").slideToggle(150, "swing");
-            $("#supplier_name").focus();
-        } else {
-            $("#add_category").slideToggle(150, "swing");
-            $("#category_name").focus();
+    function supplierDrawer(type) {
+        $("#add_supplier").slideToggle(150, "swing");
+        switch (type) {
+            case 'add':
+                $("#supplier_name").val("").focus();
+                $("#supplier_add_button").html("Add");
+                break;
+            case 'edit':
+                $("#supplier_name").val($(".supplier_li.active").children("span").html()).focus();
+                $("#supplier_add_button").html("Save");
+        }
+    }
+
+    function categoryDrawer(type) {
+        $("#add_category").slideToggle(150, "swing");
+        switch (type) {
+            case 'add':
+                $("#category_name").val("").focus();
+                $("#category_add_button").html("Add");
+                break;
+            case 'edit':
+                $("#category_name").val($(".category_li.active").children("span").html()).focus();
+                $("#category_add_button").html("Save");
         }
     }
 
     function closeDrawer(obj) {
         $(obj).parent().slideToggle(150, "swing");
+    }
+
+    function addSupplierButton(obj) {
+        switch ($(obj).html()) {
+            case 'Add':
+                addSupplier();
+                break;
+            case 'Save':
+                editSupplier();
+        }
+    }
+
+    function addCategoryButton(obj) {
+        switch ($(obj).html()) {
+            case 'Add':
+                addCategory();
+                break;
+            case 'Save':
+                editCategory();
+        }
     }
 
     function addSupplier() {
@@ -239,6 +308,18 @@ $_SESSION["last_activity"] = time();
                     .log('"'+categoryName+'" already exists');
             }
         });
+    }
+
+    function editSupplier() {
+        $("#edit_s_name").val($("#supplier_name").val());
+        $("#edit_s_id").val($(".supplier_li.active").attr("id"));
+        $("#supplier_form").submit();
+    }
+
+    function editCategory() {
+        $("#edit_c_name").val($("#category_name").val());
+        $("#edit_c_id").val($(".category_li.active").attr("id"));
+        $("#category_form").submit();
     }
 
     function updateSupplierOrder() {
