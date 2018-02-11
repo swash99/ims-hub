@@ -7,6 +7,7 @@ require_once "database/supplier_table.php";
 require_once "database/item_table.php";
 require_once "database/inventory_table.php";
 require_once "database/invoice_table.php";
+require_once "database/invoice_bulk_table.php";
 require_once "database/conversation_table.php";
 require_once "database/notification_status_table.php";
 require_once "database/sub_notification_status_table.php";
@@ -284,6 +285,9 @@ if (isset($_POST["showInvoiceList"])) {
         $date = date_add(date_create($row["date"]), date_interval_create_from_date_string("1 day"));
     echo '<li>
             <a class="invoice_date" onclick="showInvoice(this)">
+                <div class="status">
+                    <span></span>
+                </div>
                 <div id="left">
                     <span>'.date_format($date, "jS").'</span>
                 </div>
@@ -354,6 +358,66 @@ if (isset($_POST["getTrackedInvoice"])) {
                 </tr>';
     }
 }
+
+if (isset($_POST["getBulkInvoice"])) {
+    $result = InvoiceBulkTable::get_bulk_invoice($_POST["dateStart"], $_POST["dateEnd"], $_POST["database"]);
+    $current_category = null;
+    while ($row = $result->fetch_assoc()) {
+        $item_data = InvoiceTable::get_bulk_quantity($row["item_id"], $_POST["dateStart"], $_POST["dateEnd"], $_POST["database"]);
+        if ($row["category_name"] != $current_category AND $row["category_name"] != null) {
+            $current_category = $row["category_name"];
+            echo '<tbody class="print_tbody" id="print_tbody">
+                    <tr id="category"><td colspan="7" class="table_heading">'.$row["category_name"].'</td></tr>
+                    <tr id="category_columns">
+                        <th>Status</th>
+                        <th>Item</th>
+                        <th>Unit</th>
+                        <th>Quantity Required</th>
+                        <th>Quantity Delivered</th>
+                        <th>Cost</th>
+                        <th>Notes</th>
+                    </tr>';
+        }
+        $total_quantity = "";
+        while ($item_row = $item_data->fetch_assoc()) {
+            $quantity = is_numeric($item_row["quantity_custom"]) ? $item_row["quantity_custom"] : $item_row["quantity_required"];
+            $total_quantity += $quantity;
+        }
+        $total_quantity = $total_quantity == "" ? "-" : $total_quantity;
+        $cost = is_numeric($row["cost_delivered"]) ? "$ ".$row["cost_delivered"] : "-";
+        $delivered_warning = "";
+        $notes = $row["invoice_notes"] != "" ? $row["invoice_notes"] : $row["notes"];
+
+        if ($total_quantity == $row["quantity_delivered"]) {
+            $cell_class = "marked";
+            $text = "delivered";
+        } else if ($row["quantity_delivered"] != "" && $total_quantity != $row["quantity_delivered"]) {
+            $cell_class = "marked_warning";
+            $text = "delivered <br> discrepancy";
+            $delivered_warning = "field_warning";
+        } else {
+            $cell_class = "";
+            $text = "not delivered";
+        }
+
+        echo    '<tr id="column_data" class="row">
+                    <td class="row_mark '.$cell_class.'">
+                        <span class="icon entypo-cancel"></span>
+                        <span class="text">'.$text.'</span>
+                    </td>
+                    <td id="item_name">'.$row["item_name"].'</td>
+                    <td>'.$row["unit"].'</td>
+                    <td id="quantity_required">'.$total_quantity.'</td>
+                    <td class="'.$delivered_warning.'"><input  onchange="markCustom(this); updateBulkQuantity(this);" type="number" id="quantity_delivered" value="'.$row["quantity_delivered"].'" '.$readonly.' '.($row["quantity_delivered"] != "" ? "readonly" : "").' ></td>
+                    <td class="cost">'.$cost.'</td>
+                    <td id="td_notes">
+                        <textarea name="" id="" rows="2" onchange="updateNotes(this)" value="'.$notes.'" '.$readonly.' >'.$notes.'</textarea>
+                    </td>
+                    <input type="hidden" id="item_id" value="'.$row["item_id"].'">
+                </tr>';
+    }
+}
+
 if (isset($_POST["getSuppliers"])) {
     $result = SupplierTable::get_suppliers($_POST["date"]);
     if ($result) {
@@ -448,11 +512,45 @@ if (isset($_POST["getItemPrice"])) {
 if (isset($_POST["markInvoiceRead"])) {
     echo InvoiceTable::mark_invoice_read($_POST["id"], $_POST["status"], $_POST["database"]);
 }
+if (isset($_POST["markBulkInvoiceRead"])) {
+    echo InvoiceTable::mark_bulk_invoice_read($_POST["id"], $_POST["status"], $_POST["database"]);
+}
 if (isset($_POST["getUnreadCount"])) {
     echo InvoiceTable::get_unread_count($_POST["database"]);
 }
+if (isset($_POST["getBulkUnreadCount"])) {
+    echo InvoiceTable::get_bulk_unread_count($_POST["database"]);
+}
+if (isset($_POST["getTotalUnreadCount"])) {
+    echo InvoiceTable::get_total_unread_count($_POST["database"]);
+}
 if (isset($_POST["updateQuantityDelivered"])) {
     echo InvoiceTable::update_quantity_delivered($_POST["quantity"], $_POST["itemId"], $_POST["date"], $_POST["database"]);
+}
+if (isset($_POST["updateBulkQuantityDelivered"])) {
+    $date_start = date_create($_POST["dateStart"]);
+    $date_end = date_create($_POST["dateEnd"]);
+    $date_next = $date_start;
+    $total_delivered = $_POST["quantity"];
+    while ($date_next <= $date_end) {
+        $row = InvoiceTable::get_quantity_required(date_format($date_next, 'Y-m-d'), $_POST["itemId"], $_POST["database"])->fetch_assoc();
+        $item_quantity = is_numeric($row["quantity_custom"]) ? $row["quantity_custom"] : $row["quantity_required"];
+        $item_quantity = $item_quantity == "" ? 'NULL' : $item_quantity;
+        if ($date_next < $date_end) {
+            if (($total_delivered - $item_quantity) > 0) {
+                $item_quantity = $item_quantity;
+                // $total_delivered = $total_delivered - $item_quantity;
+                $total_delivered = $total_delivered - $item_quantity;
+            } else {
+                $item_quantity = $total_delivered;
+                $total_delivered = 'NULL';
+            }
+        } else {
+            $item_quantity = $total_delivered;
+        }
+        echo InvoiceTable::update_quantity_delivered($item_quantity, $_POST["itemId"], date_format($date_next, 'Y-m-d'), $_POST["database"]);
+        $date_next = date_add($date_next, date_interval_create_from_date_string("1 day"));
+    }
 }
 if (isset($_POST["updateInvoiceNotes"])) {
     echo InvoiceTable::update_invoice_note($_POST["note"], $_POST["itemId"], $_POST["date"], $_POST["database"]);

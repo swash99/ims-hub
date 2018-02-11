@@ -14,7 +14,7 @@ if(isset($_POST["dateview"])) {
 }
 if(isset($_SESSION["username"])) {
     $unread_count = ConversationTable::count_unread_conversations($_SESSION["username"]);
-    $invoice_total_count = InvoiceTable::get_unread_count("Waterloo") + InvoiceTable::get_unread_count("Mississauga");
+    $invoice_total_count = InvoiceTable::get_total_unread_count("Waterloo") + InvoiceTable::get_total_unread_count("Mississauga");
 }
 ?>
 
@@ -76,7 +76,6 @@ if(isset($_SESSION["username"])) {
     </ul>
 </nav>
 
-<script type="text/javascript" src="//code.jquery.com/jquery-2.2.0.min.js"></script>
 <script>
     $(document).ready(function(){
         $("nav ul li").hover(function(){

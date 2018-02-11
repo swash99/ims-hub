@@ -18,10 +18,44 @@ class InvoiceTable extends DbRemoteTable {
         return parent::query($sql, $database)->fetch_assoc()["count"];
     }
 
+    public static function get_bulk_unread_count($database) {
+        $sql = "SELECT COUNT(id) AS count FROM InvoiceBulk
+                WHERE status = 0";
+
+        return parent::query($sql, $database)->fetch_assoc()["count"];
+    }
+
+    public static function get_total_unread_count($database) {
+        $sql = "SELECT COUNT(id) AS count FROM
+                (SELECT id FROM Invoice
+                WHERE status = 0
+                UNION
+                SELECT id FROM InvoiceBulk
+                WHERE status = 0) AS CountTable";
+
+        return parent::query($sql, $database)->fetch_assoc()["count"];
+    }
+
     public static function mark_invoice_read($id, $status, $database) {
         $sql = "UPDATE Invoice
                 SET status = $status
                 WHERE id = $id";
+
+        return parent::query($sql, $database);
+    }
+
+    public static function mark_bulk_invoice_read($id, $status, $database) {
+        $sql = "UPDATE InvoiceBulk
+                SET status = $status
+                WHERE id = $id";
+
+        return parent::query($sql, $database);
+    }
+
+    public static function get_quantity_required($date, $item_id, $database) {
+        $sql = "SELECT quantity_required, quantity_custom FROM Inventory
+                WHERE date = '$date'
+                AND item_id = $item_id";
 
         return parent::query($sql, $database);
     }
@@ -91,6 +125,14 @@ class InvoiceTable extends DbRemoteTable {
         } else {
             throw new Exception("get_sales_tax query failed");
         }
+    }
+
+    public static function get_bulk_quantity($item_id, $date_start, $date_end, $database) {
+        $sql = "SELECT quantity_required, quantity_custom FROM Inventory
+                WHERE item_id = $item_id
+                AND `date` BETWEEN '$date_start' AND '$date_end'";
+
+        return parent::query($sql, $database);
     }
 }
 ?>
