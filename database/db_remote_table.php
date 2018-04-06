@@ -23,6 +23,13 @@ class DbRemoteTable {
                 $dbname = "ivs_database";
                 $conn = null;
                 break;
+            case "Eglinton":
+                $servername = "localhost";
+                $username = "root";
+                $password = null;
+                $dbname = "ivs_database";
+                $conn = null;
+                break;
         }
         if ($conn == null) {
             $conn = new mysqli($servername, $username,

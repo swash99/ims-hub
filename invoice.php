@@ -61,6 +61,16 @@ $_SESSION["last_activity"] = time();
                                 <?php endif ?>
                                 <input type="hidden" id="sauga_sales_tax" value="<?php echo InvoiceTable::get_sales_tax("Mississauga"); ?>">
                             </a>
+                        </li> 
+                        <li>
+                            <a onclick="showInvoiceList(this)">
+                                <span class="left" id="Eglinton">Eglinton</span>
+                                <?php $count = InvoiceTable::get_total_unread_count("Eglinton") ?>
+                                <?php if ($count > 0): ?>
+                                    <span class="right counter"><?php echo $count ?></span>
+                                <?php endif ?>
+                                <input type="hidden" id="eglinton_sales_tax" value="<?php echo InvoiceTable::get_sales_tax("Eglinton"); ?>">
+                            </a>
                         </li>
                     </ul>
                 </div>
@@ -140,6 +150,7 @@ $_SESSION["last_activity"] = time();
                                     <input type="hidden" id="date_end" value="<?php echo $row["date_end"] ?>">
                                     <input type="hidden" id="database_name" value="Waterloo">
                                     <input type="hidden" id="invoice_id" value="<?php echo $row['id'] ?>">
+                                    <input type="hidden" id="qp_date" value="<?php echo $row["qp_date"] ?>">
                                 </li>
                                 <?php endwhile?>
                             </ul>
@@ -217,6 +228,85 @@ $_SESSION["last_activity"] = time();
                                     <input type="hidden" id="date_end" value="<?php echo $row["date_end"] ?>">
                                     <input type="hidden" id="database_name" value="Mississauga">
                                     <input type="hidden" id="invoice_id" value="<?php echo $row['id'] ?>">
+                                    <input type="hidden" id="qp_date" value="<?php echo $row["qp_date"] ?>">
+                                </li>
+                                <?php endwhile?>
+                            </ul>
+                        </div>
+                        <div id="Eglinton_list">
+                            <ul class="side_nav invoice_list" id="daily_ul">
+                                <?php $result = InvoiceTable::get_tracked_invoices("Eglinton");
+                                $old_month = null;
+                                $old_year = null;
+                                while ($row = $result->fetch_assoc()) :
+                                $date = date_add(date_create($row["date"]), date_interval_create_from_date_string("1 day")); ?>
+                                <?php if ($old_year != date_format($date, "Y")):
+                                        $old_year = date_format($date, "Y");?>
+                                        <li class="list_heading invoice_year"><span><?php echo date_format($date, "Y") ?></span></li>
+                                <?php endif ?>
+                                <?php if ($old_month != date_format($date, "F")):
+                                        $old_month = date_format($date, "F");?>
+                                        <li class="list_heading invoice_month"><span><?php echo date_format($date, "F") ?></span></li>
+                                <?php endif ?>
+                                <li>
+                                    <a class="invoice_date" onclick="showInvoice(this)">
+                                        <?php if ($row["status"] == "0"): ?>
+                                            <div class="status show">
+                                                <span>new</span>
+                                            </div>
+                                        <?php endif ?>
+                                        <div id="left">
+                                            <span><?php echo date_format($date, "jS"); ?></span>
+                                        </div>
+                                        <div id="right">
+                                            <span><?php echo date_format($date, "l"); ?></span>
+                                        </div>
+                                        <input type="hidden" id="selected_date" value="<?php echo date_format($date, "D, jS M Y") ?>">
+                                        <input type="hidden" id="created_date" value="<?php echo date_format(date_create($row["date"]), "jS M Y") ?>">
+                                    </a>
+                                    <input type="hidden" value="<?php echo $row["date"] ?>">
+                                    <input type="hidden" id="database_name" value="Eglinton">
+                                    <input type="hidden" id="invoice_id" value="<?php echo $row["id"] ?>">
+                                </li>
+                            <?php endwhile?>
+                            </ul>
+                            <ul class="side_nav invoice_list display_none" id="bulk_ul">
+                                <?php $result = InvoiceBulkTable::get_tracked_invoices("Eglinton");
+                                $old_month = null;
+                                $old_year = null;
+                                while ($row = $result->fetch_assoc()) :
+                                $date_start = date_create($row["date_start"]);
+                                $date_end = date_create($row["date_end"]); ?>
+                                <?php if ($old_year != date_format($date_end, "Y")):
+                                        $old_year = date_format($date_end, "Y");?>
+                                        <li class="list_heading invoice_year"><span><?php echo date_format($date_end, "Y") ?></span></li>
+                                <?php endif ?>
+                                <?php if ($old_month != date_format($date_end, "F")):
+                                        $old_month = date_format($date_end, "F");?>
+                                        <li class="list_heading invoice_month"><span><?php echo date_format($date_end, "F") ?></span></li>
+                                <?php endif ?>
+                                <li>
+                                    <a class="invoice_date" onclick="showBulkInvoice(this)">
+                                        <?php if ($row["status"] == "0"): ?>
+                                            <div class="status show">
+                                                <span>new</span>
+                                            </div>
+                                        <?php endif ?>
+                                        <div id="left">
+                                            <span><?php echo date_format($date_end, "jS"); ?></span>
+                                        </div>
+                                        <div id="right">
+                                            <span><?php echo date_format($date_end, "l"); ?></span>
+                                        </div>
+                                        <input type="hidden" id="selected_date"
+                                                value="<?php echo date_format($date_start, "D, jS M Y")." - ".date_format($date_end, "jS M Y, D") ?>">
+                                        <input type="hidden" id="created_date" value="<?php echo date_format(date_create($row["date_created"]), "jS M Y") ?>">
+                                    </a>
+                                    <input type="hidden" id="date_start" value="<?php echo $row["date_start"] ?>">
+                                    <input type="hidden" id="date_end" value="<?php echo $row["date_end"] ?>">
+                                    <input type="hidden" id="database_name" value="Eglinton">
+                                    <input type="hidden" id="invoice_id" value="<?php echo $row['id'] ?>">
+                                    <input type="hidden" id="qp_date" value="<?php echo $row["qp_date"] ?>">
                                 </li>
                                 <?php endwhile?>
                             </ul>
@@ -355,9 +445,10 @@ $_SESSION["last_activity"] = time();
     function showBulkInvoice(obj) {
         var dateStart = obj.parentNode.children[1].value;
         var dateEnd = obj.parentNode.children[2].value;
+        var qpDate = obj.parentNode.children[5].value;
         var database = obj.parentNode.children[3].value;
 
-        $.post("jq_ajax.php", {getBulkInvoice: "", dateStart: dateStart, dateEnd: dateEnd, database}, function(data, status) {
+        $.post("jq_ajax.php", {getBulkInvoice: "", dateStart, dateEnd, qpDate, database}, function(data, status) {
             $(".print_tbody").remove();
             $("#invoice_table").append(data);
             checkRequired();
@@ -672,10 +763,18 @@ $_SESSION["last_activity"] = time();
     function totalCost() {
         var totalCost = "";
         var costSpan = document.getElementById("cost_span");
-        if ($("#heading").children().html() == "Waterloo") {
-            var tax = $("#waterloo_sales_tax").val();
-        } else {
-            var tax = $("#sauga_sales_tax").val();
+        switch ($("#heading").children().html()) {
+            case 'Waterloo':
+                var tax = $("#waterloo_sales_tax").val();
+                break;
+            case 'Mississauga':
+                var tax = $("#sauga_sales_tax").val();
+                break;
+            case 'Eglinton':
+                var tax = $("#eglinton_sales_tax").val();
+                break;
+            default:
+                break;
         }
         $(".cost").each(function() {
             var value = $(this).html() != "-" ? $(this).html() : "";

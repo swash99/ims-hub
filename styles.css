@@ -2329,7 +2329,7 @@ input:focus{
 .invoice_list{
     flex: 1;
 }
-#Waterloo_list, #Mississauga_list{
+#Waterloo_list, #Mississauga_list, #Eglinton_list{
     display: none;
     flex: 1;
 }

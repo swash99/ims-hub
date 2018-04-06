@@ -360,10 +360,11 @@ if (isset($_POST["getTrackedInvoice"])) {
 }
 
 if (isset($_POST["getBulkInvoice"])) {
-    $result = InvoiceBulkTable::get_bulk_invoice($_POST["dateStart"], $_POST["dateEnd"], $_POST["database"]);
+    $date_end = date_format(date_sub(date_create($_POST["dateEnd"]), date_interval_create_from_date_string("1 day")), "Y-m-d");
+    $result = InvoiceBulkTable::get_bulk_invoice($_POST["qpDate"], $date_end, $_POST["database"]);
     $current_category = null;
     while ($row = $result->fetch_assoc()) {
-        $item_data = InvoiceTable::get_bulk_quantity($row["item_id"], $_POST["dateStart"], $_POST["dateEnd"], $_POST["database"]);
+        $item_data = InvoiceTable::get_bulk_quantity($row["item_id"], $_POST["qpDate"], $date_end, $_POST["database"]);
         if ($row["category_name"] != $current_category AND $row["category_name"] != null) {
             $current_category = $row["category_name"];
             echo '<tbody class="print_tbody" id="print_tbody">
