@@ -11,16 +11,23 @@ class InvoiceTable extends DbRemoteTable {
         return parent::query($sql, $database);
     }
 
+    public static function get_tracked($date, $database) {
+        $sql = "SELECT * FROM Invoice
+                WHERE `date` = '$date'";
+
+        return parent::query($sql, $database);
+    }
+
     public static function get_unread_count($database) {
         $sql = "SELECT COUNT(id) AS count FROM Invoice
-                WHERE status = 0";
+                WHERE status = 1";
 
         return parent::query($sql, $database)->fetch_assoc()["count"];
     }
 
     public static function get_bulk_unread_count($database) {
         $sql = "SELECT COUNT(id) AS count FROM InvoiceBulk
-                WHERE status = 0";
+                WHERE status = 1";
 
         return parent::query($sql, $database)->fetch_assoc()["count"];
     }
@@ -28,12 +35,20 @@ class InvoiceTable extends DbRemoteTable {
     public static function get_total_unread_count($database) {
         $sql = "SELECT COUNT(id) AS count FROM
                 (SELECT id FROM Invoice
-                WHERE status = 0
-                UNION
+                WHERE status = 1
+                UNION ALL
                 SELECT id FROM InvoiceBulk
-                WHERE status = 0) AS CountTable";
+                WHERE status = 1) AS CountTable";
 
         return parent::query($sql, $database)->fetch_assoc()["count"];
+    }
+
+    public static function update_invoice_status($id, $status, $database) {
+        $sql = "UPDATE Invoice
+                SET status = $status
+                WHERE id = $id";
+
+        return parent::query($sql, $database);
     }
 
     public static function mark_invoice_read($id, $status, $database) {

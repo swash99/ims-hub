@@ -307,7 +307,22 @@ if (isset($_POST["showInvoiceList"])) {
 
 if (isset($_POST["getTrackedInvoice"])) {
     $result = InvoiceTable::get_invoice_table($_POST["date"], $_POST["database"]);
+    $invoice_status = InvoiceTable::get_tracked($_POST["date"], $_POST["database"])->fetch_assoc()["status"];
     $current_category = null;
+    switch ($invoice_status) {
+        case "1":
+            $invoice_lock = null;
+            break;
+        case "2":
+            $invoice_lock = "readonly";
+            break;
+        case "3":
+            $invoice_lock = "readonly";
+            break;
+        default:
+            $invoice_lock = null;
+            break;
+    }
     while ($row = $result->fetch_assoc()) {
         if ($row["category_name"] != $current_category AND $row["category_name"] != null) {
             $current_category = $row["category_name"];
@@ -349,10 +364,10 @@ if (isset($_POST["getTrackedInvoice"])) {
                     <td id="item_name">'.$row["item_name"].'</td>
                     <td>'.$row["unit"].'</td>
                     <td id="quantity_required">'.$quantity_required.'</td>
-                    <td class="'.$delivered_warning.'"><input  onchange="markCustom(this); updateQuantity(this);" type="number" id="quantity_delivered" value="'.$row["quantity_delivered"].'" '.$readonly.' '.($row["quantity_delivered"] != "" ? "readonly" : "").' ></td>
+                    <td class="'.$delivered_warning.'"><input  onchange="markCustom(this); updateQuantity(this);" type="number" id="quantity_delivered" value="'.$row["quantity_delivered"].'" '.$invoice_lock.' '.$readonly.' '.($row["quantity_delivered"] != "" ? "readonly" : "").' ></td>
                     <td class="cost">'.$cost.'</td>
                     <td id="td_notes">
-                        <textarea name="" id="" rows="2" onchange="updateNotes(this)" value="'.$notes.'" '.$readonly.' >'.$notes.'</textarea>
+                        <textarea name="" id="" rows="2" onchange="updateNotes(this)" value="'.$notes.'" '.$invoice_lock.'  '.$readonly.' >'.$notes.'</textarea>
                     </td>
                     <input type="hidden" id="item_id" value="'.$row["item_id"].'">
                 </tr>';
@@ -466,6 +481,13 @@ if (isset($_POST["getSupplierCategory"])) {
     }
 }
 
+if (isset($_POST["getInvoiceStatus"])) {
+    echo InvoiceTable::get_tracked($_POST["date"], $_POST["database"]) -> fetch_assoc()["status"];
+}
+if (isset($_POST["getBulkInvoiceStatus"])) {
+    echo InvoiceBulkTable::get_status($_POST["dateCreated"], $_POST["database"]) -> fetch_assoc()["status"];
+}
+
 if (isset($_POST["addCategory"])) {
     echo CategoryTable::add_category($_POST["categoryName"], $_POST["supplierId"], $_POST["date"]);
 }
@@ -509,6 +531,12 @@ if (isset($_POST["getGroupUsers"])) {
 }
 if (isset($_POST["getItemPrice"])) {
     echo InvoiceTable::get_item_price($_POST["itemId"], $_POST["database"]);
+}
+if (isset($_POST["updateInvoiceStatus"])) {
+    echo InvoiceTable::update_invoice_status($_POST["id"], $_POST["status"], $_POST["database"]);
+}
+if (isset($_POST["updateBulkInvoiceStatus"])) {
+    echo InvoiceBulkTable::update_invoice_status($_POST["id"], $_POST["status"], $_POST["database"]);
 }
 if (isset($_POST["markInvoiceRead"])) {
     echo InvoiceTable::mark_invoice_read($_POST["id"], $_POST["status"], $_POST["database"]);

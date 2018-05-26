@@ -54,7 +54,7 @@ $_SESSION["last_activity"] = time();
                         </li>
                         <li>
                             <a onclick="showInvoiceList(this)">
-                                <span class="left" id="Mississauga">Mississauga</span>
+                                <span class="left" id="Mississauga">Erin Mills</span>
                                 <?php $count = InvoiceTable::get_total_unread_count("Mississauga") ?>
                                 <?php if ($count > 0): ?>
                                     <span class="right counter"><?php echo $count ?></span>
@@ -94,7 +94,7 @@ $_SESSION["last_activity"] = time();
                                 <?php endif ?>
                                 <li>
                                     <a class="invoice_date" onclick="showInvoice(this)">
-                                        <?php if ($row["status"] == "0"): ?>
+                                        <?php if ($row["status"] == "1"): ?>
                                             <div class="status show">
                                                 <span>new</span>
                                             </div>
@@ -108,7 +108,7 @@ $_SESSION["last_activity"] = time();
                                         <input type="hidden" id="selected_date" value="<?php echo date_format($date, "D, jS M Y") ?>">
                                         <input type="hidden" id="created_date" value="<?php echo date_format(date_create($row["date"]), "jS M Y") ?>">
                                     </a>
-                                    <input type="hidden" value="<?php echo $row["date"] ?>">
+                                    <input type="hidden" id="invoice_created_date" value="<?php echo $row["date"] ?>">
                                     <input type="hidden" id="database_name" value="Waterloo">
                                     <input type="hidden" id="invoice_id" value="<?php echo $row["id"] ?>">
                                 </li>
@@ -131,7 +131,7 @@ $_SESSION["last_activity"] = time();
                                 <?php endif ?>
                                 <li>
                                     <a class="invoice_date" onclick="showBulkInvoice(this)">
-                                        <?php if ($row["status"] == "0"): ?>
+                                        <?php if ($row["status"] == "1"): ?>
                                             <div class="status show">
                                                 <span>new</span>
                                             </div>
@@ -151,6 +151,7 @@ $_SESSION["last_activity"] = time();
                                     <input type="hidden" id="database_name" value="Waterloo">
                                     <input type="hidden" id="invoice_id" value="<?php echo $row['id'] ?>">
                                     <input type="hidden" id="qp_date" value="<?php echo $row["qp_date"] ?>">
+                                    <input type="hidden" id="invoice_created_date" value="<?php echo $row["date_created"] ?>">
                                 </li>
                                 <?php endwhile?>
                             </ul>
@@ -172,7 +173,7 @@ $_SESSION["last_activity"] = time();
                                 <?php endif ?>
                                 <li>
                                     <a class="invoice_date" onclick="showInvoice(this)">
-                                        <?php if ($row["status"] == "0"): ?>
+                                        <?php if ($row["status"] == "1"): ?>
                                             <div class="status show">
                                                 <span>new</span>
                                             </div>
@@ -186,7 +187,7 @@ $_SESSION["last_activity"] = time();
                                         <input type="hidden" id="selected_date" value="<?php echo date_format($date, "D, jS M Y") ?>">
                                         <input type="hidden" id="created_date" value="<?php echo date_format(date_create($row["date"]), "jS M Y") ?>">
                                     </a>
-                                    <input type="hidden" value="<?php echo $row["date"] ?>">
+                                    <input type="hidden" id="invoice_created_date" value="<?php echo $row["date"] ?>">
                                     <input type="hidden" id="database_name" value="Mississauga">
                                     <input type="hidden" id="invoice_id" value="<?php echo $row["id"] ?>">
                                 </li>
@@ -209,7 +210,7 @@ $_SESSION["last_activity"] = time();
                                 <?php endif ?>
                                 <li>
                                     <a class="invoice_date" onclick="showBulkInvoice(this)">
-                                        <?php if ($row["status"] == "0"): ?>
+                                        <?php if ($row["status"] == "1"): ?>
                                             <div class="status show">
                                                 <span>new</span>
                                             </div>
@@ -229,6 +230,7 @@ $_SESSION["last_activity"] = time();
                                     <input type="hidden" id="database_name" value="Mississauga">
                                     <input type="hidden" id="invoice_id" value="<?php echo $row['id'] ?>">
                                     <input type="hidden" id="qp_date" value="<?php echo $row["qp_date"] ?>">
+                                    <input type="hidden" id="invoice_created_date" value="<?php echo $row["date_created"] ?>">
                                 </li>
                                 <?php endwhile?>
                             </ul>
@@ -250,7 +252,7 @@ $_SESSION["last_activity"] = time();
                                 <?php endif ?>
                                 <li>
                                     <a class="invoice_date" onclick="showInvoice(this)">
-                                        <?php if ($row["status"] == "0"): ?>
+                                        <?php if ($row["status"] == "1"): ?>
                                             <div class="status show">
                                                 <span>new</span>
                                             </div>
@@ -264,7 +266,7 @@ $_SESSION["last_activity"] = time();
                                         <input type="hidden" id="selected_date" value="<?php echo date_format($date, "D, jS M Y") ?>">
                                         <input type="hidden" id="created_date" value="<?php echo date_format(date_create($row["date"]), "jS M Y") ?>">
                                     </a>
-                                    <input type="hidden" value="<?php echo $row["date"] ?>">
+                                    <input type="hidden" id="invoice_created_date" value="<?php echo $row["date"] ?>">
                                     <input type="hidden" id="database_name" value="Eglinton">
                                     <input type="hidden" id="invoice_id" value="<?php echo $row["id"] ?>">
                                 </li>
@@ -287,7 +289,7 @@ $_SESSION["last_activity"] = time();
                                 <?php endif ?>
                                 <li>
                                     <a class="invoice_date" onclick="showBulkInvoice(this)">
-                                        <?php if ($row["status"] == "0"): ?>
+                                        <?php if ($row["status"] == "1"): ?>
                                             <div class="status show">
                                                 <span>new</span>
                                             </div>
@@ -307,6 +309,7 @@ $_SESSION["last_activity"] = time();
                                     <input type="hidden" id="database_name" value="Eglinton">
                                     <input type="hidden" id="invoice_id" value="<?php echo $row['id'] ?>">
                                     <input type="hidden" id="qp_date" value="<?php echo $row["qp_date"] ?>">
+                                    <input type="hidden" id="invoice_created_date" value="<?php echo $row["date_created"] ?>">
                                 </li>
                                 <?php endwhile?>
                             </ul>
@@ -368,6 +371,37 @@ $_SESSION["last_activity"] = time();
                     </tr>
                 </table>
             </div>
+
+            <div class="invoice_timeline">
+                <div class="status_option left option_disabled">
+                    <span class="fa-chevron-circle-left icon"></span>
+                    <span class="text">Fill Order</span>
+                </div>
+                <div class="status_view">
+                    <div class="status" data-status="1">
+                        <span class="text">fill order</span>
+                        <div class="div_icon next_bar">
+                            <span class="icon"></span>
+                        </div>
+                    </div>
+                    <div class="status" data-status="2">
+                        <span class="text">Order Sent</span>
+                        <div class="div_icon next_bar">
+                            <span class="icon"></span>
+                        </div>
+                    </div>
+                    <div class="status" data-status="3">
+                        <span class="text">delivered</span>
+                        <div class="div_icon">
+                            <span class="icon"></span>
+                        </div>
+                    </div>
+                </div>
+                <div class="status_option right option_disabled">
+                    <span class="text">Send Order</span>
+                    <span class="icon fa-chevron-circle-right"></span>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -407,10 +441,11 @@ $_SESSION["last_activity"] = time();
     }
 
     function showInvoiceList(obj) {
-        var database = $(obj).find(".left").html();
+        var database = $(obj).find(".left").attr("id");
         $("#"+database+"_list").css("display", "flex");
         $("#"+database+"_list").addClass("list_active");
-        $("#heading").children().html(database);
+        $("#heading").children().html($(obj).find(".left").html());
+        $("#heading").children().attr("id", database);
         $("#div_invoice_list").css("display", "flex");
         updateCount(database);
         updateBulkCount(database);
@@ -436,8 +471,8 @@ $_SESSION["last_activity"] = time();
         $.post("jq_ajax.php", {getTrackedInvoice: "", date: date, database: database}, function(data, status) {
             $(".print_tbody").remove();
             $("#invoice_table").append(data);
+            updateTimeLine();
             checkRequired();
-            markInvoiceRead(obj);
             totalCost();
         });
     }
@@ -451,36 +486,124 @@ $_SESSION["last_activity"] = time();
         $.post("jq_ajax.php", {getBulkInvoice: "", dateStart, dateEnd, qpDate, database}, function(data, status) {
             $(".print_tbody").remove();
             $("#invoice_table").append(data);
+            updateTimeLine();
             checkRequired();
-            markBulkInvoiceRead(obj);
             totalCost();
         });
     }
 
     function markInvoiceRead(obj) {
-        if ($(obj).find(".status").length > 0) {
-            var id = $(obj).parent().find("#invoice_id").val();
-            var status = 1;
-            var database = $("#heading").children().html();
-
-            $.post("jq_ajax.php", {markInvoiceRead: "", id: id, status: status, database: database}, function() {
-                updateCount(database);
-                $(obj).find(".status").removeClass("show");
-            });
+        var database = $("#heading").children().attr("id");
+        updateCount(database);
+        if ($(obj).find(".status").hasClass("show")) {
+            $(obj).find(".status").removeClass("show");
+        } else {
+            $(obj).find(".status").addClass("show");
         }
     }
 
     function markBulkInvoiceRead(obj) {
-        if ($(obj).find(".status").length > 0) {
-            var id = $(obj).parent().find("#invoice_id").val();
-            var status = 1;
-            var database = $("#heading").children().html();
+        var database = $("#heading").children().attr("id");
+        updateBulkCount(database);
+        if ($(obj).find(".status").hasClass("show")) {
+            $(obj).find(".status").removeClass("show");
+        } else {
+            $(obj).find(".status").addClass("show");
+        }
+    }
 
+    function updateInvoiceStatus() {
+        var date = $("#daily_ul .invoice_date.active").parent().find("#invoice_created_date").val();
+        var database = $("#heading").children().attr("id");
+        var id = $(".invoice_date.active").parent().find("#invoice_id").val();
+        var status = 2;
 
-            $.post("jq_ajax.php", {markBulkInvoiceRead: "", id: id, status: status, database: database}, function() {
-                updateBulkCount(database);
-                $(obj).find(".status").removeClass("show");
+        $.post("jq_ajax.php", {updateInvoiceStatus: "", id: id, status: status, database: database}, function() {
+            markInvoiceRead($("#daily_ul .invoice_date.active")[0]);
+            $("#daily_ul .invoice_date.active").trigger("click");
+        });
+    }
+
+    function updateBulkInvoiceStatus() {
+        var date = $("#bulk_ul .invoice_date.active").parent().find("#invoice_created_date").val();
+        var database = $("#heading").children().attr("id");
+        var id = $(".invoice_date.active").parent().find("#invoice_id").val();
+        var status = 2;
+
+        $.post("jq_ajax.php", {updateBulkInvoiceStatus: "", id: id, status: status, database: database}, function() {
+            markBulkInvoiceRead($("#bulk_ul .invoice_date.active")[0]);
+            $("#bulk_ul .invoice_date.active").trigger("click");
+        });
+    } 
+
+    function revertInvoiceStatus() {
+        var date = $("#daily_ul .invoice_date.active").parent().find("#invoice_created_date").val();
+        var database = $("#heading").children().attr("id");
+        var id = $(".invoice_date.active").parent().find("#invoice_id").val();
+        var status = 1;
+
+        $.post("jq_ajax.php", {updateInvoiceStatus: "", id: id, status: status, database: database}, function() {
+            markInvoiceRead($("#daily_ul .invoice_date.active")[0]);
+            $("#daily_ul .invoice_date.active").trigger("click");
+        });
+    }
+
+    function revertBulkInvoiceStatus() {
+        var date = $("#bulk_ul .invoice_date.active").parent().find("#invoice_created_date").val();
+        var database = $("#heading").children().attr("id");
+        var id = $(".invoice_date.active").parent().find("#invoice_id").val();
+        var status = 1;
+
+        $.post("jq_ajax.php", {updateBulkInvoiceStatus: "", id: id, status: status, database: database}, function() {
+            markBulkInvoiceRead($("#bulk_ul .invoice_date.active")[0]);
+            $("#bulk_ul .invoice_date.active").trigger("click");
+        });
+    }
+
+    function updateTimeLine() {
+        var database = $("#heading").children().attr("id");
+        switch ($(".option.selected").find(".icon_small_text").html()) {
+            case 'Daily Order':
+                var date = $("#daily_ul .invoice_date.active").parent().find("#invoice_created_date").val();
+                $.post("jq_ajax.php", {getInvoiceStatus: "", date: date, database: database}, function(data) {
+                    changeStatus(data);
+                });
+                break;
+            case 'Bulk Order':
+                var date = $("#bulk_ul .invoice_date.active").parent().find("#invoice_created_date").val();
+                $.post("jq_ajax.php", {getBulkInvoiceStatus: "", dateCreated: date, database: database}, function(data) {
+                    changeStatus(data);
+                });
+                break;
+        }
+        function changeStatus(status) {
+            $(".invoice_timeline").find(".status").each(function() {
+                $(this).removeClass("selected").removeClass("completed");
+                if ($(this).attr("data-status") < status) {
+                    $(this).addClass("completed");
+                } else if ($(this).attr("data-status") == status) {
+                    if ($(this).attr("data-status") == 3) {
+                        $(this).addClass("selected");
+                        $(this).addClass("completed");
+                    } else {
+                        $(this).addClass("selected");
+                    }
+                }
             });
+            $(".invoice_timeline").find(".status_option").removeClass("option_disabled");
+            switch (status) {
+                case "1":
+                    $(".invoice_timeline").find(".status_option.left").addClass("option_disabled");
+                    $(".invoice_timeline").find(".status_option.right").removeClass("option_disabled");
+                    break;
+                case "2":
+                    $(".invoice_timeline").find(".status_option.right").addClass("option_disabled");
+                    $(".invoice_timeline").find(".status_option.left").removeClass("option_disabled");
+                    break;
+                case "3":
+                    $(".invoice_timeline").find(".status_option").addClass("option_disabled");
+                    break;
+            }
         }
     }
 
@@ -525,7 +648,7 @@ $_SESSION["last_activity"] = time();
             var date = $(".invoice_date.active").next().val();
             var itemId = $(obj).parents("tr").find("#item_id").val();
             var quantity = obj.value;
-            var database = $("#heading").children().html();
+            var database = $("#heading").children().attr("id");
             quantity == "" ? quantity = "NULL" : quantity;
 
             $.post("jq_ajax.php", {updateQuantityDelivered: "", quantity: quantity, itemId: itemId, date: date, database: database}, function(data) {
@@ -555,7 +678,7 @@ $_SESSION["last_activity"] = time();
             var itemName = $(obj).parents("tr").find("#item_name").html();
             var itemId = $(obj).parents("tr").find("#item_id").val();
             var quantity = obj.value;
-            var database = $("#heading").children().html();
+            var database = $("#heading").children().attr("id");
             var dateStart = $(".list_active #bulk_ul .active").parent().find("#date_start").val();
             var dateEnd = $(".list_active #bulk_ul .active").parent().find("#date_end").val();
             quantity == "" ? quantity = "NULL" : quantity;
@@ -581,7 +704,6 @@ $_SESSION["last_activity"] = time();
     }
 
     function markCustom(obj) {
-        // var num = parseFloat(obj.value).toFixed(2);
         var num = obj.value;
         if ($(obj).val() == "") {
             $(obj).parents("tr").find(".row_mark").removeClass("marked_warning");
@@ -603,7 +725,7 @@ $_SESSION["last_activity"] = time();
     function updateCost(itemId, quantity, obj) {
         var date = $(".invoice_date.active").next().val();
         var cost = "";
-        var database = $("#heading").children().html();
+        var database = $("#heading").children().attr("id");
         if (quantity != "NULL") {
             $.post("jq_ajax.php", {getItemPrice: "", itemId: itemId, database: database}, function(data) {
                 var price = data;
@@ -627,7 +749,7 @@ $_SESSION["last_activity"] = time();
         var itemName = $(obj).parents("tr").find("#item_name").html();
         var date = $(".invoice_date.active").next().val();
         var itemId = $(obj).parents("tr").find("#item_id").val();
-        var database = $("#heading").children().html();
+        var database = $("#heading").children().attr("id");
         var note = obj.value;
 
         $.post("jq_ajax.php", {updateInvoiceNotes: "", note: note, itemId: itemId, date: date, database: database}, function(data) {
@@ -763,7 +885,7 @@ $_SESSION["last_activity"] = time();
     function totalCost() {
         var totalCost = "";
         var costSpan = document.getElementById("cost_span");
-        switch ($("#heading").children().html()) {
+        switch ($("#heading").children().attr("id")) {
             case 'Waterloo':
                 var tax = $("#waterloo_sales_tax").val();
                 break;
@@ -871,11 +993,12 @@ $_SESSION["last_activity"] = time();
             $(this).addClass('active');
             $("#print_date span").html($(this).find("#selected_date").val());
             $("#print_date .print_table_date").html("created on " + $(this).find("#created_date").val());
+            $(".invoice_timeline").css("display", "flex");
         });
 
         $("#list_back").click(function() {
             $("#div_invoice_list").removeClass("list_visible");
-            updateTotalCount($("#heading").children().html());
+            updateTotalCount($("#heading").children().attr("id"));
             $("#div_invoice_list").on("transitionend", function() {
                 $("#div_invoice_list").find(".list_active").css("display", "none").removeClass("list_active");
                 $(this).css("display", "none").unbind("transitionend");
@@ -885,6 +1008,7 @@ $_SESSION["last_activity"] = time();
                 $("#table_date_span").html("click on restaurant to see invoice list");
                 $(".print_table_date").html("");
                 $(".print_tbody").remove();
+                $(".invoice_timeline").css("display", "none");
             });
         });
 
@@ -936,6 +1060,28 @@ $_SESSION["last_activity"] = time();
             $(this).parents("#div_invoice_list").find(".list_active #daily_ul").css("display", "none");
             $(this).parents("#div_invoice_list").find(".list_active #bulk_ul").css("display", "block");
             $(this).parents("#div_invoice_list").find(".list_active #bulk_ul .invoice_date:first").trigger("click");
+        });
+
+        $(document).on("click", ".status_option.right", function() {
+            switch ($(".option.selected").find(".icon_small_text").html()) {
+                case 'Daily Order':
+                    updateInvoiceStatus();
+                    break;
+                case 'Bulk Order':
+                    updateBulkInvoiceStatus();
+                    break;
+            }
+        });
+
+        $(document).on("click", ".status_option.left", function() {
+            switch ($(".option.selected").find(".icon_small_text").html()) {
+                case 'Daily Order':
+                    revertInvoiceStatus();
+                    break;
+                case 'Bulk Order':
+                    revertBulkInvoiceStatus();
+                    break;
+            }
         });
 
         $("#popup_close").click(function() {

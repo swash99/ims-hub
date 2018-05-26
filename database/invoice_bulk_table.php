@@ -32,6 +32,21 @@ class InvoiceBulkTable extends DbRemoteTable {
         }
     }
 
+    public static function get_status($date_created, $database) {
+        $sql = "SELECT * FROM InvoiceBulk
+                WHERE  date_created = '$date_created'";
+
+        return parent::query($sql, $database);
+    }
+
+    public static function update_invoice_status($id, $status, $database) {
+        $sql = "UPDATE InvoiceBulk
+                SET status = $status
+                WHERE id = $id";
+
+        return parent::query($sql, $database);
+    }
+
     public static function get_bulk_invoice($date_start, $date_end, $database) {
         $sql = "SELECT Category.name AS category_name, Item.name AS item_name, Item.id AS item_id,
                     IFNULL(unit, '-') AS unit, IFNULL(quantity, '-') AS quantity, Inv.notes AS notes,
